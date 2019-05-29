@@ -23,6 +23,11 @@ namespace AVSketch
         public MainWindow()
         {
             InitializeComponent();
+
+            Graphics graphics = new Graphics();
+            graphics.CreateImage(800, 600);
+            DataContext = graphics;
+            CompositionTarget.Rendering += (o, e) => graphics.UpdateImage();
         }
     }
 }
