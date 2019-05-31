@@ -65,6 +65,7 @@
     <Compile Include="VectorModel\VectorLine.cs" />
     <Compile Include="VectorModel\VectorObject.cs" />
     <Compile Include="VectorModel\VectorPoint.cs" />
+    <Compile Include="VectorModel\VectorText.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

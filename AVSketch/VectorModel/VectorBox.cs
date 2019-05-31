@@ -8,11 +8,13 @@ namespace AVSketch.VectorModel
 {
     class VectorBox : VectorObject
     {
-        public VectorPoint point2;
+        public VectorPoint size;
+        public bool fillin;
 
-        public VectorBox(VectorPoint point1, VectorPoint point2) : base (point1)
+        public VectorBox(VectorPoint position, VectorPoint size, bool fillin) : base (position)
         {
-            this.point2 = point2;
+            this.size = size;
+            this.fillin = fillin;
         }
     }
 }
