@@ -41,3 +41,25 @@ D:\sdd major\AVSketch\AVSketch\obj\Debug\AVSketch.Properties.Resources.resources
 D:\sdd major\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.GenerateResource.cache
 D:\sdd major\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.CoreCompileInputs.cache
 D:\sdd major\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.CopyComplete
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\libSkiaSharp.dll
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\libSkiaSharp.dylib
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\x86\libSkiaSharp.dll
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\x64\libSkiaSharp.dll
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\AVSketch.exe.config
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\AVSketch.exe
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\AVSketch.pdb
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\SkiaSharp.dll
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\bin\Debug\SkiaSharp.xml
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.csprojAssemblyReference.cache
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\MainWindow.g.cs
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\App.g.cs
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch_MarkupCompile.cache
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch_MarkupCompile.lref
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\MainWindow.baml
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.g.resources
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.Properties.Resources.resources
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.GenerateResource.cache
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.CoreCompileInputs.cache
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.CopyComplete
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.exe
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.pdb

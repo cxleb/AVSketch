@@ -20,14 +20,53 @@ namespace AVSketch
     /// </summary>
     public partial class MainWindow : Window
     {
+        string activeTool;
+        Graphics graphics;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            Graphics graphics = new Graphics();
+            graphics = new Graphics();
+
             graphics.CreateImage(800, 600);
             DataContext = graphics;
-            CompositionTarget.Rendering += (o, e) => graphics.UpdateImage();
+            CompositionTarget.Rendering += (_o, _e) => graphics.UpdateImage();
+
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            int width = (int)mainGrid.ColumnDefinitions[1].ActualWidth;
+            int height = (int)mainGrid.ActualHeight;
+            graphics.CreateImage(width, height);
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            int width = (int)mainGrid.ColumnDefinitions[1].ActualWidth;
+            int height = (int)mainGrid.ActualHeight;
+            graphics.CreateImage(width, height);
+        }
+
+        private void Image_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void Image_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void Image_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void Image_TextInput(object sender, TextCompositionEventArgs e)
+        {
+
         }
     }
 }

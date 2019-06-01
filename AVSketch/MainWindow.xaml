@@ -5,8 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AVSketch"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <Image Source="{Binding Path=bitmap}" Stretch="Fill" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Image>
+        Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
+    <Grid x:Name="mainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40px"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid>
+            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,2"></Button>
+            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,42"></Button>
+            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,82"></Button>
+            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,122"></Button>
+            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,162"></Button>
+            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,202"></Button>
+        </Grid>
+
+        <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseRightButtonDown="Image_MouseRightButtonDown" MouseRightButtonUp="Image_MouseRightButtonUp" MouseMove="Image_MouseMove" TextInput="Image_TextInput"></Image>
     </Grid>
 </Window>

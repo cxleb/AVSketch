@@ -16,6 +16,9 @@ namespace AVSketch
     {
         public static float scale = 10f;
 
+        private int width;
+        private int height;
+
         private WriteableBitmap _bitmap;
 
         public WriteableBitmap bitmap
@@ -56,13 +59,13 @@ namespace AVSketch
 
         public void CreateImage(int width, int height)
         {
-            _bitmap =  new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, BitmapPalettes.Halftone256Transparent);
+            _bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, BitmapPalettes.Halftone256Transparent);
+            this.width = width;
+            this.height = height;
         }
-        int x = 0;
+
         public void UpdateImage()
         {
-            int width = (int)_bitmap.Width,
-                height = (int)_bitmap.Height;
             _bitmap.Lock();
             var surface = SKSurface.Create(new SKImageInfo(width, height, SKColorType.Bgra8888), _bitmap.BackBuffer);
 
@@ -73,6 +76,8 @@ namespace AVSketch
             drawEllipse(canvas, ellipse);
             drawText(canvas, text);
 
+            canvas.DrawRect(0, 0, width, height, new SKPaint() { StrokeWidth = 5, Color = SKColor.Parse("000000"), IsStroke=true });
+
             _bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             _bitmap.Unlock();
 
@@ -81,12 +86,12 @@ namespace AVSketch
 
         private float convertXCoord(float x)
         {
-            return ((float)_bitmap.Width / 2 ) + x * scale;
+            return ((float)width / 2 ) + x * scale;
         }
 
         private float convertYCoord(float y)
         {
-            return ((float)_bitmap.Height / 2) - y * scale;
+            return ((float)height / 2) - y * scale;
         }
 
         private void drawLine(SKCanvas canvas, VectorLine line)
