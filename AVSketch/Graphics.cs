@@ -18,6 +18,9 @@ namespace AVSketch
 
         public int width;
         public int height;
+        public float transformX = 0;
+        public float transformY = 0;
+        private SKSurface surface;
 
         private WriteableBitmap _bitmap;
 
@@ -49,6 +52,7 @@ namespace AVSketch
         public void CreateImage(int width, int height)
         {
             _bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, BitmapPalettes.Halftone256Transparent);
+            surface = SKSurface.Create(new SKImageInfo(width, height, SKColorType.Bgra8888), _bitmap.BackBuffer);
             this.width = width;
             this.height = height;
         }
@@ -56,11 +60,14 @@ namespace AVSketch
         public void UpdateImage(Screen screen)
         {
             _bitmap.Lock();
-            var surface = SKSurface.Create(new SKImageInfo(width, height, SKColorType.Bgra8888), _bitmap.BackBuffer);
+            transformX = screen.translateX;
+            transformY = screen.translateY;
 
             SKCanvas canvas = surface.Canvas;
 
-            foreach(KeyValuePair<string, VectorObject> obj in screen.objects)
+            canvas.DrawRect(0, 0, width, height, new SKPaint() { Color = SKColor.Parse("ffffff"), IsStroke=false });
+
+            foreach (KeyValuePair<string, VectorObject> obj in screen.objects)
             {
                 if (obj.Value is VectorBox)
                 {
@@ -80,8 +87,7 @@ namespace AVSketch
                 }
             }
 
-            canvas.DrawRect(0, 0, width, height, new SKPaint() { StrokeWidth = 5, Color = SKColor.Parse("000000"), IsStroke=true });
-
+            
             _bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             _bitmap.Unlock();
 
@@ -90,12 +96,12 @@ namespace AVSketch
 
         private float convertXCoord(float x)
         {
-            return ((float)width / 2 ) + x * scale;
+            return transformX + x * scale;
         }
 
         private float convertYCoord(float y)
         {
-            return ((float)height / 2) - y * scale;
+            return transformY - y * scale;
         }
 
         private void drawLine(SKCanvas canvas, VectorLine line)

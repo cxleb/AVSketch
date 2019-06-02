@@ -13,12 +13,12 @@
         </Grid.ColumnDefinitions>
 
         <Grid>
-            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,2"></Button>
-            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,42"></Button>
-            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,82"></Button>
-            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,122"></Button>
-            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,162"></Button>
-            <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,202"></Button>
+            <Button x:Name="pan_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,2" Click="Pan_selector_Click">pan</Button>
+            <Button x:Name="shape_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,42" Click="Shape_selector_Click">shape</Button>
+            <Button x:Name="line_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,82" Click="Line_selector_Click">line</Button>
+            <Button x:Name="text_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,122" Click="Text_selector_Click">text</Button>
+            <Button x:Name="transform_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,162" Click="Transform_selector_Click">transform</Button>
+            <Button x:Name="delete_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,202" Click="Delete_selector_Click">delete</Button>
         </Grid>
 
         <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseMove="Image_MouseMove" TextInput="Image_TextInput" MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown" MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"></Image>
