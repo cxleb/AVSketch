@@ -60,6 +60,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Graphics.cs" />
+    <Compile Include="Screen.cs" />
     <Compile Include="VectorModel\VectorBox.cs" />
     <Compile Include="VectorModel\VectorEllipse.cs" />
     <Compile Include="VectorModel\VectorLine.cs" />

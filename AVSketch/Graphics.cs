@@ -16,8 +16,8 @@ namespace AVSketch
     {
         public static float scale = 10f;
 
-        private int width;
-        private int height;
+        public int width;
+        public int height;
 
         private WriteableBitmap _bitmap;
 
@@ -33,20 +33,9 @@ namespace AVSketch
             }
         }
 
-        public VectorBox box;
-        public VectorLine line;
-        public VectorEllipse ellipse;
-        public VectorText text;
-
         public Graphics()
         {
-            box = new VectorBox(new VectorPoint(0f, 0f), new VectorPoint(10f, 10f), true);
-            line = new VectorLine(new VectorPoint(0f, 0f));
-            line.addPoint(new VectorPoint(-10f, -10f));
-            line.addPoint(new VectorPoint(-20f, 0f));
-            line.addPoint(new VectorPoint(-10f, 10f));
-            ellipse = new VectorEllipse(new VectorPoint(-20f, 20f), 10f, 5f, true);
-            text = new VectorText(new VectorPoint(20f, 20f), "text");
+            
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -64,17 +53,32 @@ namespace AVSketch
             this.height = height;
         }
 
-        public void UpdateImage()
+        public void UpdateImage(Screen screen)
         {
             _bitmap.Lock();
             var surface = SKSurface.Create(new SKImageInfo(width, height, SKColorType.Bgra8888), _bitmap.BackBuffer);
 
             SKCanvas canvas = surface.Canvas;
 
-            drawBox(canvas, box);
-            drawLine(canvas, line);
-            drawEllipse(canvas, ellipse);
-            drawText(canvas, text);
+            foreach(KeyValuePair<string, VectorObject> obj in screen.objects)
+            {
+                if (obj.Value is VectorBox)
+                {
+                    drawBox(canvas, obj.Value as VectorBox);
+                }
+                else if (obj.Value is VectorLine)
+                {
+                    drawLine(canvas, obj.Value as VectorLine);
+                }
+                else if (obj.Value is VectorEllipse)
+                {
+                    drawEllipse(canvas, obj.Value as VectorEllipse);
+                }
+                else if (obj.Value is VectorText)
+                {
+                    drawText(canvas, obj.Value as VectorText);
+                }
+            }
 
             canvas.DrawRect(0, 0, width, height, new SKPaint() { StrokeWidth = 5, Color = SKColor.Parse("000000"), IsStroke=true });
 

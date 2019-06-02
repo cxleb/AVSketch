@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using AVSketch.VectorModel;
+
 namespace AVSketch
 {
     /// <summary>
@@ -21,17 +23,34 @@ namespace AVSketch
     public partial class MainWindow : Window
     {
         string activeTool;
+        string tooluid;
+        double prevX = 0;
+        double prevY = 0;
+        bool tooling = false;
+
         Graphics graphics;
+        Screen screen;
 
         public MainWindow()
         {
             InitializeComponent();
 
             graphics = new Graphics();
+            screen = new Screen();
+
+
+            screen.addObject("box", new VectorBox(new VectorPoint(0f, 0f), new VectorPoint(10f, 10f), true));
+            VectorLine line = new VectorLine(new VectorPoint(0f, 0f));
+            line.addPoint(new VectorPoint(-10f, -10f));
+            line.addPoint(new VectorPoint(-20f, 0f));
+            line.addPoint(new VectorPoint(-10f, 10f));
+            screen.addObject("line", line);
+            screen.addObject("ellipse", new VectorEllipse(new VectorPoint(-20f, 20f), 10f, 5f, true));
+            screen.addObject("text", new VectorText(new VectorPoint(20f, 20f), "text"));
 
             graphics.CreateImage(800, 600);
             DataContext = graphics;
-            CompositionTarget.Rendering += (_o, _e) => graphics.UpdateImage();
+            CompositionTarget.Rendering += (_o, _e) => graphics.UpdateImage(screen);
 
         }
 
@@ -49,19 +68,28 @@ namespace AVSketch
             graphics.CreateImage(width, height);
         }
 
-        private void Image_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void ImageContainer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-
+            tooluid = Environment.TickCount.ToString();
+            float x = ((float)e.GetPosition(imageContainer).X - graphics.width/2f) / Graphics.scale;
+            float y = (graphics.height / 2f - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
+            screen.addObject(tooluid, new VectorLine(new VectorPoint(x, y)));
+            tooling = true;
         }
 
-        private void Image_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void ImageContainer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-
+            tooling = false;
         }
 
         private void Image_MouseMove(object sender, MouseEventArgs e)
         {
-
+            if (tooling)
+            {
+                float x = ((float)e.GetPosition(imageContainer).X - graphics.width / 2f) / Graphics.scale;
+                float y = (graphics.height / 2f - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
+                (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x, y));
+            }
         }
 
         private void Image_TextInput(object sender, TextCompositionEventArgs e)

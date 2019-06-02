@@ -21,6 +21,6 @@
             <Button Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,202"></Button>
         </Grid>
 
-        <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseRightButtonDown="Image_MouseRightButtonDown" MouseRightButtonUp="Image_MouseRightButtonUp" MouseMove="Image_MouseMove" TextInput="Image_TextInput"></Image>
+        <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseMove="Image_MouseMove" TextInput="Image_TextInput" MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown" MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"></Image>
     </Grid>
 </Window>
