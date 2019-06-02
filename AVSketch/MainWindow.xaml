@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AVSketch"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
+        Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" TextInput="Window_TextInput" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
     <Grid x:Name="mainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40px"/>
@@ -21,6 +21,6 @@
             <Button x:Name="delete_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,202" Click="Delete_selector_Click">delete</Button>
         </Grid>
 
-        <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseMove="Image_MouseMove" TextInput="Image_TextInput" MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown" MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"></Image>
+        <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseMove="Image_MouseMove" MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown" MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"></Image>
     </Grid>
 </Window>

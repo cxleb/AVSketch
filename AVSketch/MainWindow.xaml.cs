@@ -23,12 +23,15 @@ namespace AVSketch
     public partial class MainWindow : Window
     {
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform, 5 - delete
+        int oldActiveTool = 2;
         string tooluid;
         double prevX = 0;
         double prevY = 0;
         double mouseOldX = 0;
         double mouseOldY = 0;
         bool tooling = false;
+        bool oldTooling = false;
+
 
         Graphics graphics;
         Screen screen;
@@ -101,6 +104,12 @@ namespace AVSketch
         private void ImageContainer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             tooling = false;
+            if (activeTool == 2)
+            {
+                float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
+                float y = (screen.translateY - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
+                (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x, y));
+            }
         }
 
         private void Image_MouseMove(object sender, MouseEventArgs e)
@@ -128,8 +137,36 @@ namespace AVSketch
             }
         }
 
-        private void Image_TextInput(object sender, TextCompositionEventArgs e)
+        private void Window_TextInput(object sender, TextCompositionEventArgs e)
         {
+            //MessageBox.Show(e.Text);
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                oldActiveTool = activeTool;
+                activeTool = 0;
+                oldTooling = tooling;
+                tooling = true;
+                
+                mouseOldX = Mouse.GetPosition(imageContainer).X;
+                mouseOldY = Mouse.GetPosition(imageContainer).Y;
+
+                interpretTooling();
+            }
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                activeTool = oldActiveTool;
+                tooling = oldTooling;
+                
+                interpretTooling();
+            }
         }
 
         private void Pan_selector_Click(object sender, RoutedEventArgs e)
@@ -177,5 +214,6 @@ namespace AVSketch
             transform_selector.Background = activeTool == 4 ? Brushes.LightGray : Brushes.DarkGray;
             delete_selector.Background = activeTool == 5 ? Brushes.LightGray : Brushes.DarkGray;
         }
+
     }
 }

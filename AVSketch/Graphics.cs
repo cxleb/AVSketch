@@ -66,6 +66,7 @@ namespace AVSketch
             SKCanvas canvas = surface.Canvas;
 
             canvas.DrawRect(0, 0, width, height, new SKPaint() { Color = SKColor.Parse("ffffff"), IsStroke=false });
+            canvas.DrawCircle(transformX, transformY, 3f, new SKPaint() { Color = SKColor.Parse("CCCCCC"), IsStroke = false });
 
             foreach (KeyValuePair<string, VectorObject> obj in screen.objects)
             {
