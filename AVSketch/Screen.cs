@@ -14,6 +14,8 @@ namespace AVSketch
         public float translateX = 0f;
         public float translateY = 0f;
 
+        public int oldtool = 0;
+
         public Screen()
         {
             objects = new Dictionary<string, VectorObject>();

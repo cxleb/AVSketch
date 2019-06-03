@@ -23,7 +23,6 @@ namespace AVSketch
     public partial class MainWindow : Window
     {
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform, 5 - delete
-        int oldActiveTool = 2;
         string tooluid;
         double prevX = 0;
         double prevY = 0;
@@ -31,6 +30,7 @@ namespace AVSketch
         double mouseOldY = 0;
         bool tooling = false;
         bool oldTooling = false;
+        int oldActiveTool = 2;
 
 
         Graphics graphics;
@@ -142,31 +142,15 @@ namespace AVSketch
             //MessageBox.Show(e.Text);
         }
 
+        
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space)
-            {
-                oldActiveTool = activeTool;
-                activeTool = 0;
-                oldTooling = tooling;
-                tooling = true;
-                
-                mouseOldX = Mouse.GetPosition(imageContainer).X;
-                mouseOldY = Mouse.GetPosition(imageContainer).Y;
-
-                interpretTooling();
-            }
+            
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space)
-            {
-                activeTool = oldActiveTool;
-                tooling = oldTooling;
-                
-                interpretTooling();
-            }
+            
         }
 
         private void Pan_selector_Click(object sender, RoutedEventArgs e)
@@ -179,30 +163,35 @@ namespace AVSketch
         {
             activeTool = 1;
             interpretTooling();
+            imageContainer.Focus();
         }
 
         private void Line_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 2;
             interpretTooling();
+            imageContainer.Focus();
         }
 
         private void Text_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 3;
             interpretTooling();
+            imageContainer.Focus();
         }
 
         private void Transform_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 4;
             interpretTooling();
+            imageContainer.Focus();
         }
 
         private void Delete_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 5;
             interpretTooling();
+            imageContainer.Focus();
         }
 
         private void interpretTooling()
@@ -215,5 +204,32 @@ namespace AVSketch
             delete_selector.Background = activeTool == 5 ? Brushes.LightGray : Brushes.DarkGray;
         }
 
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space && !e.IsRepeat)
+            {
+                oldActiveTool = activeTool;
+                oldTooling = tooling;
+                activeTool = 0;
+                tooling = true;
+
+                mouseOldX = Mouse.GetPosition(imageContainer).X;
+                mouseOldY = Mouse.GetPosition(imageContainer).Y;
+
+                interpretTooling();
+
+            }
+        }
+
+        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space && !e.IsRepeat)
+            {
+                activeTool = oldActiveTool;
+                tooling = oldTooling;
+
+                interpretTooling();
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AVSketch"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" TextInput="Window_TextInput" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
+        Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" TextInput="Window_TextInput" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
     <Grid x:Name="mainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40px"/>
@@ -13,12 +13,12 @@
         </Grid.ColumnDefinitions>
 
         <Grid>
-            <Button x:Name="pan_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,2" Click="Pan_selector_Click">pan</Button>
-            <Button x:Name="shape_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,42" Click="Shape_selector_Click">shape</Button>
-            <Button x:Name="line_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,82" Click="Line_selector_Click">line</Button>
-            <Button x:Name="text_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,122" Click="Text_selector_Click">text</Button>
-            <Button x:Name="transform_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,162" Click="Transform_selector_Click">transform</Button>
-            <Button x:Name="delete_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,202" Click="Delete_selector_Click">delete</Button>
+            <Button x:Name="pan_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,2" Focusable="False" Click="Pan_selector_Click">pan</Button>
+            <Button x:Name="shape_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,42" Focusable="False" Click="Shape_selector_Click">shape</Button>
+            <Button x:Name="line_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,82" Focusable="False" Click="Line_selector_Click">line</Button>
+            <Button x:Name="text_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,122" Focusable="False" Click="Text_selector_Click">text</Button>
+            <Button x:Name="transform_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,162" Focusable="False" Click="Transform_selector_Click">transform</Button>
+            <Button x:Name="delete_selector" Height='38px' Width='38px' VerticalAlignment="Top" Margin="0,202" Focusable="False" Click="Delete_selector_Click">delete</Button>
         </Grid>
 
         <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseMove="Image_MouseMove" MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown" MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"></Image>
