@@ -11,6 +11,7 @@ namespace AVSketch
     class Screen
     {
         public Dictionary<string, VectorObject> objects;
+        public string current_colour = "000000";
         public float translateX = 0f;
         public float translateY = 0f;
 

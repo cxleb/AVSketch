@@ -63,3 +63,5 @@ C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.CoreCo
 C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.csproj.CopyComplete
 C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.exe
 C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\AVSketch.pdb
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\ColourPicker.g.cs
+C:\Users\Caleb\Stuff\Projects\AVSketch\AVSketch\obj\Debug\ColourPicker.baml

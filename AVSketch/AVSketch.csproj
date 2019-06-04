@@ -59,6 +59,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ColourPicker.xaml.cs">
+      <DependentUpon>ColourPicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Graphics.cs" />
     <Compile Include="Screen.cs" />
     <Compile Include="VectorModel\VectorBox.cs" />
@@ -67,6 +70,10 @@
     <Compile Include="VectorModel\VectorObject.cs" />
     <Compile Include="VectorModel\VectorPoint.cs" />
     <Compile Include="VectorModel\VectorText.cs" />
+    <Page Include="ColourPicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

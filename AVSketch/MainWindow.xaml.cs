@@ -70,6 +70,8 @@ namespace AVSketch
             screen.translateY = graphics.height / 2f;
 
             interpretTooling();
+            update_colour();
+
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -80,6 +82,8 @@ namespace AVSketch
             screen.translateX = graphics.width / 2f;
             screen.translateY = graphics.height / 2f;
         }
+
+        // TOOL LOGIC
 
         private void ImageContainer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -95,6 +99,7 @@ namespace AVSketch
             {
                 tooluid = Environment.TickCount.ToString();
                 screen.addObject(tooluid, new VectorLine(new VectorPoint(x, y)));
+                screen.objects[tooluid].colour = screen.current_colour;
                 tooling = true;
                 prevX = x;
                 prevY = y;
@@ -142,16 +147,36 @@ namespace AVSketch
             //MessageBox.Show(e.Text);
         }
 
-        
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            
+            if (e.Key == Key.Space && !e.IsRepeat)
+            {
+                oldActiveTool = activeTool;
+                oldTooling = tooling;
+                activeTool = 0;
+                tooling = true;
+
+                mouseOldX = Mouse.GetPosition(imageContainer).X;
+                mouseOldY = Mouse.GetPosition(imageContainer).Y;
+
+                interpretTooling();
+
+            }
         }
 
-        private void Window_KeyUp(object sender, KeyEventArgs e)
+        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            
+            if (e.Key == Key.Space && !e.IsRepeat)
+            {
+                activeTool = oldActiveTool;
+                tooling = oldTooling;
+
+                interpretTooling();
+            }
         }
+
+        // TOOL SELECTOR BUTTONS
 
         private void Pan_selector_Click(object sender, RoutedEventArgs e)
         {
@@ -204,32 +229,29 @@ namespace AVSketch
             delete_selector.Background = activeTool == 5 ? Brushes.LightGray : Brushes.DarkGray;
         }
 
-        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        // COLOUR SELECTOR LOGIC
+
+        private void Colour_selector_Click(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.Space && !e.IsRepeat)
-            {
-                oldActiveTool = activeTool;
-                oldTooling = tooling;
-                activeTool = 0;
-                tooling = true;
+            ColourPicker colourPicker = new ColourPicker(screen.current_colour);
+            colourPicker.Show();
 
-                mouseOldX = Mouse.GetPosition(imageContainer).X;
-                mouseOldY = Mouse.GetPosition(imageContainer).Y;
-
-                interpretTooling();
-
-            }
+            colourPicker.ColourChange += ColourPicker_ColourChange;
         }
 
-        private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
+        private void ColourPicker_ColourChange(object sender, string colour)
         {
-            if (e.Key == Key.Space && !e.IsRepeat)
-            {
-                activeTool = oldActiveTool;
-                tooling = oldTooling;
+            screen.current_colour = colour;
+            update_colour();
+        }
 
-                interpretTooling();
-            }
+        public void update_colour()
+        {
+            int R = Int32.Parse(screen.current_colour.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+            int G = Int32.Parse(screen.current_colour.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+            int B = Int32.Parse(screen.current_colour.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+            var brush = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+            colour_selector.Background = brush;
         }
     }
 }

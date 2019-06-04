@@ -9,6 +9,7 @@ namespace AVSketch.VectorModel
     class VectorObject
     {
         public VectorPoint position;
+        public string colour = "000000";
 
         public VectorObject(VectorPoint position)
         {
