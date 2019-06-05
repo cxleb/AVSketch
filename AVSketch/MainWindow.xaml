@@ -31,11 +31,16 @@
             <Button x:Name="transform_selector" Grid.Row="4" Height='38px' Width='38px' Focusable="False" Click="Transform_selector_Click">transform</Button>
             <Button x:Name="delete_selector" Grid.Row="5" Height='38px' Width='38px' Focusable="False" Click="Delete_selector_Click">delete</Button>
             <Button x:Name="colour_selector" Grid.Row="6" Height="38px" Width="38px" Focusable="False" Click="Colour_selector_Click" ></Button>
-            <Grid Grid.Row="6">
-                
-            </Grid>
         </Grid>
+        <Grid x:Name="imaging_grid" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="24px"/>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Row="1" MouseMove="Image_MouseMove" MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown" MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"></Image>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" x:Name="tool_options_container" >
 
-        <Image x:Name="imageContainer" Source="{Binding Path=bitmap}" Grid.Column="1" MouseMove="Image_MouseMove" MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown" MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"></Image>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

@@ -24,14 +24,18 @@ namespace AVSketch
     {
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform, 5 - delete
         string tooluid;
+
         double prevX = 0;
         double prevY = 0;
         double mouseOldX = 0;
         double mouseOldY = 0;
         bool tooling = false;
+
         bool oldTooling = false;
         int oldActiveTool = 2;
 
+        string current_shape = "box";
+        bool current_fill_in = true;
 
         Graphics graphics;
         Screen screen;
@@ -63,8 +67,8 @@ namespace AVSketch
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            int width = (int)mainGrid.ColumnDefinitions[1].ActualWidth;
-            int height = (int)mainGrid.ActualHeight;
+            int width = (int)imaging_grid.ActualWidth;
+            int height = (int)imaging_grid.RowDefinitions[1].ActualHeight;
             graphics.CreateImage(width, height);
             screen.translateX = graphics.width / 2f;
             screen.translateY = graphics.height / 2f;
@@ -76,8 +80,8 @@ namespace AVSketch
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            int width = (int)mainGrid.ColumnDefinitions[1].ActualWidth;
-            int height = (int)mainGrid.ActualHeight;
+            int width = (int)imaging_grid.ActualWidth;
+            int height = (int)imaging_grid.RowDefinitions[1].ActualHeight;
             graphics.CreateImage(width, height);
             screen.translateX = graphics.width / 2f;
             screen.translateY = graphics.height / 2f;
@@ -95,6 +99,22 @@ namespace AVSketch
                 mouseOldY = e.GetPosition(imageContainer).Y;
                 tooling = true;
             }
+            if (activeTool == 1)
+            {
+                tooluid = Environment.TickCount.ToString();
+                if (current_shape == "box")
+                {
+                    screen.addObject(tooluid, new VectorBox(new VectorPoint(x, y), new VectorPoint(1,1), current_fill_in));
+                }
+                else if (current_shape == "ellipse")
+                {
+                    screen.addObject(tooluid, new VectorEllipse(new VectorPoint(x, y), 1, 1, current_fill_in));
+                }
+                screen.objects[tooluid].colour = screen.current_colour;
+                tooling = true;
+                prevX = x;
+                prevY = y;
+            }
             if (activeTool == 2)
             {
                 tooluid = Environment.TickCount.ToString();
@@ -104,6 +124,7 @@ namespace AVSketch
                 prevX = x;
                 prevY = y;
             }
+
         }
 
         private void ImageContainer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -129,6 +150,21 @@ namespace AVSketch
                     screen.translateY -= (float)( mouseOldY - e.GetPosition(imageContainer).Y);
                     mouseOldX = e.GetPosition(imageContainer).X;
                     mouseOldY = e.GetPosition(imageContainer).Y;
+                }
+                if(activeTool == 1)
+                {
+                    if (current_shape == "box")
+                    {
+                        (screen.objects[tooluid] as VectorBox).size.x = x - (float)prevX;
+                        (screen.objects[tooluid] as VectorBox).size.y = (float)prevY - y ;
+                        (screen.objects[tooluid] as VectorBox).fillin = current_fill_in;
+                    }
+                    else if (current_shape == "ellipse")
+                    {
+                        (screen.objects[tooluid] as VectorEllipse).xRadius = (float)prevX - x;
+                        (screen.objects[tooluid] as VectorEllipse).yRadius = (float)prevY - y;
+                        (screen.objects[tooluid] as VectorEllipse).fillin = current_fill_in;
+                    }
                 }
                 if (activeTool == 2)
                 {
@@ -227,6 +263,29 @@ namespace AVSketch
             text_selector.Background = activeTool == 3 ? Brushes.LightGray : Brushes.DarkGray;
             transform_selector.Background = activeTool == 4 ? Brushes.LightGray : Brushes.DarkGray;
             delete_selector.Background = activeTool == 5 ? Brushes.LightGray : Brushes.DarkGray;
+
+            tool_options_container.Children.RemoveRange(0, tool_options_container.Children.Count);
+
+            if(activeTool == 1)
+            {
+                ComboBox combobox = new ComboBox();
+                combobox.Height = 24;
+                //combobox.HorizontalAlignment = HorizontalAlignment.Left;
+                combobox.Items.Add("box");
+                combobox.Items.Add("ellipse");
+                combobox.SelectedItem = current_shape;
+                combobox.SelectionChanged += (_o, _e) => current_shape = (string)combobox.SelectedItem;
+                tool_options_container.Children.Add(combobox);
+
+                CheckBox checkbox = new CheckBox();
+                checkbox.Margin = new Thickness(5, 5, 5, 5);
+                //checkbox.HorizontalAlignment = HorizontalAlignment.Left;
+                checkbox.Content = "fill in";
+                checkbox.IsChecked = !current_fill_in;
+                checkbox.Unchecked += (_o, _e) => current_fill_in = true;
+                checkbox.Checked += (_o, _e) => current_fill_in = false;
+                tool_options_container.Children.Add(checkbox);
+            }
         }
 
         // COLOUR SELECTOR LOGIC
