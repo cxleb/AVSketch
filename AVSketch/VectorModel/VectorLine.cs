@@ -9,6 +9,7 @@ namespace AVSketch.VectorModel
     class VectorLine : VectorObject
     {
         public List<VectorPoint> points;
+        public float strokeThickness;
 
         public VectorLine(VectorPoint start) : base(start)
         {

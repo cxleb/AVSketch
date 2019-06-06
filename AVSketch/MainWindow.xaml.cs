@@ -37,6 +37,8 @@ namespace AVSketch
         string current_shape = "box";
         bool current_fill_in = true;
 
+        float strokeThickness = 5;
+
         Graphics graphics;
         Screen screen;
 
@@ -46,18 +48,6 @@ namespace AVSketch
 
             graphics = new Graphics();
             screen = new Screen();
-
-
-            /*screen.addObject("box", new VectorBox(new VectorPoint(0f, 0f), new VectorPoint(10f, 10f), true));
-            VectorLine line = new VectorLine(new VectorPoint(0f, 0f));
-            line.addPoint(new VectorPoint(-10f, -10f));
-            line.addPoint(new VectorPoint(-20f, 0f));
-            line.addPoint(new VectorPoint(-10f, 10f));
-            screen.addObject("line", line);
-            screen.addObject("ellipse", new VectorEllipse(new VectorPoint(-20f, 20f), 10f, 5f, true));
-            screen.addObject("text", new VectorText(new VectorPoint(20f, 20f), "text"));*/
-
-
 
             graphics.CreateImage(800, 600);
             DataContext = graphics;
@@ -105,10 +95,12 @@ namespace AVSketch
                 if (current_shape == "box")
                 {
                     screen.addObject(tooluid, new VectorBox(new VectorPoint(x, y), new VectorPoint(1,1), current_fill_in));
+                    (screen.objects[tooluid] as VectorBox).strokeThickness = strokeThickness;
                 }
                 else if (current_shape == "ellipse")
                 {
                     screen.addObject(tooluid, new VectorEllipse(new VectorPoint(x, y), 1, 1, current_fill_in));
+                    (screen.objects[tooluid] as VectorEllipse).strokeThickness = strokeThickness;
                 }
                 screen.objects[tooluid].colour = screen.current_colour;
                 tooling = true;
@@ -120,6 +112,7 @@ namespace AVSketch
                 tooluid = Environment.TickCount.ToString();
                 screen.addObject(tooluid, new VectorLine(new VectorPoint(x, y)));
                 screen.objects[tooluid].colour = screen.current_colour;
+                (screen.objects[tooluid] as VectorLine).strokeThickness = strokeThickness;
                 tooling = true;
                 prevX = x;
                 prevY = y;
@@ -266,25 +259,57 @@ namespace AVSketch
 
             tool_options_container.Children.RemoveRange(0, tool_options_container.Children.Count);
 
+            if(activeTool == 1 || activeTool == 2)
+            {
+                TextBlock strokeLabel = new TextBlock();
+                strokeLabel.Height = 24;
+                strokeLabel.Text = "Stroke Thickness:";
+                strokeLabel.Margin = new Thickness(5, 5, 5, 5);
+                tool_options_container.Children.Add(strokeLabel);
+
+                ComboBox strokeSelector = new ComboBox();
+                strokeSelector.Height = 24;
+                //shapeSelector.HorizontalAlignment = HorizontalAlignment.Left;
+                strokeSelector.Items.Add(1f);
+                strokeSelector.Items.Add(2f);
+                strokeSelector.Items.Add(3f);
+                strokeSelector.Items.Add(4f);
+                strokeSelector.Items.Add(5f);
+                strokeSelector.Items.Add(6f);
+                strokeSelector.Items.Add(7f);
+                strokeSelector.Items.Add(8f);
+                strokeSelector.Items.Add(9f);
+                strokeSelector.Items.Add(10f);
+                strokeSelector.SelectedItem = strokeThickness;
+                strokeSelector.SelectionChanged += (_o, _e) => strokeThickness = (float)strokeSelector.SelectedItem;
+                tool_options_container.Children.Add(strokeSelector);
+            }
+
             if(activeTool == 1)
             {
-                ComboBox combobox = new ComboBox();
-                combobox.Height = 24;
-                //combobox.HorizontalAlignment = HorizontalAlignment.Left;
-                combobox.Items.Add("box");
-                combobox.Items.Add("ellipse");
-                combobox.SelectedItem = current_shape;
-                combobox.SelectionChanged += (_o, _e) => current_shape = (string)combobox.SelectedItem;
-                tool_options_container.Children.Add(combobox);
+                TextBlock shapeLabel = new TextBlock();
+                shapeLabel.Height = 24;
+                shapeLabel.Text = "Shape:";
+                shapeLabel.Margin = new Thickness(5, 5, 5, 5);
+                tool_options_container.Children.Add(shapeLabel);
 
-                CheckBox checkbox = new CheckBox();
-                checkbox.Margin = new Thickness(5, 5, 5, 5);
-                //checkbox.HorizontalAlignment = HorizontalAlignment.Left;
-                checkbox.Content = "fill in";
-                checkbox.IsChecked = !current_fill_in;
-                checkbox.Unchecked += (_o, _e) => current_fill_in = true;
-                checkbox.Checked += (_o, _e) => current_fill_in = false;
-                tool_options_container.Children.Add(checkbox);
+                ComboBox shapeSelector = new ComboBox();
+                shapeSelector.Height = 24;
+                //shapeSelector.HorizontalAlignment = HorizontalAlignment.Left;
+                shapeSelector.Items.Add("box");
+                shapeSelector.Items.Add("ellipse");
+                shapeSelector.SelectedItem = current_shape;
+                shapeSelector.SelectionChanged += (_o, _e) => current_shape = (string)shapeSelector.SelectedItem;
+                tool_options_container.Children.Add(shapeSelector);
+
+                CheckBox fillin_check = new CheckBox();
+                fillin_check.Margin = new Thickness(5, 5, 5, 5);
+                //fillin_check.HorizontalAlignment = HorizontalAlignment.Left;
+                fillin_check.Content = "fill in";
+                fillin_check.IsChecked = !current_fill_in;
+                fillin_check.Unchecked += (_o, _e) => current_fill_in = true;
+                fillin_check.Checked += (_o, _e) => current_fill_in = false;
+                tool_options_container.Children.Add(fillin_check);
             }
         }
 

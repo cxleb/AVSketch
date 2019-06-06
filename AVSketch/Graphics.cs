@@ -111,7 +111,7 @@ namespace AVSketch
             VectorPoint prevPoint = line.position;
             foreach(VectorPoint point in line.points)
             {
-                canvas.DrawLine(convertXCoord(prevPoint.x), convertYCoord(prevPoint.y), convertXCoord(point.x), convertYCoord(point.y), new SKPaint() { StrokeWidth = 5, Color = SKColor.Parse(line.colour)});
+                canvas.DrawLine(convertXCoord(prevPoint.x), convertYCoord(prevPoint.y), convertXCoord(point.x), convertYCoord(point.y), new SKPaint() { StrokeWidth = line.strokeThickness, Color = SKColor.Parse(line.colour)});
                 prevPoint = point;
             }
         }
@@ -119,12 +119,12 @@ namespace AVSketch
         private void drawBox(SKCanvas canvas, VectorBox box)
         {
 
-            canvas.DrawRect(convertXCoord(box.position.x), convertYCoord(box.position.y), box.size.x * scale, box.size.y * scale, new SKPaint() { StrokeWidth = 5, Color = SKColor.Parse(box.colour), IsStroke = box.fillin });
+            canvas.DrawRect(convertXCoord(box.position.x), convertYCoord(box.position.y), box.size.x * scale, box.size.y * scale, new SKPaint() { StrokeWidth = box.strokeThickness, Color = SKColor.Parse(box.colour), IsStroke = box.fillin });
         }
 
         private void drawEllipse(SKCanvas canvas, VectorEllipse ellipse)
         {
-            canvas.DrawOval(convertXCoord(ellipse.position.x), convertYCoord(ellipse.position.y), ellipse.xRadius * scale, ellipse.yRadius * scale, new SKPaint() { StrokeWidth = 5, Color = SKColor.Parse(ellipse.colour), IsStroke = ellipse.fillin });
+            canvas.DrawOval(convertXCoord(ellipse.position.x), convertYCoord(ellipse.position.y), ellipse.xRadius * scale, ellipse.yRadius * scale, new SKPaint() { StrokeWidth = ellipse.strokeThickness, Color = SKColor.Parse(ellipse.colour), IsStroke = ellipse.fillin });
         }
 
         private void drawText(SKCanvas canvas, VectorText text)

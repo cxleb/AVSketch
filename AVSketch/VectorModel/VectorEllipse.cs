@@ -11,6 +11,7 @@ namespace AVSketch.VectorModel
         public float xRadius;
         public float yRadius;
         public bool fillin;
+        public float strokeThickness;
 
         public VectorEllipse(VectorPoint point, float xRadius, float yRadius, bool fillin) : base(point)
         {

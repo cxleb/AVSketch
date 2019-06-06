@@ -10,6 +10,7 @@ namespace AVSketch.VectorModel
     {
         public VectorPoint size;
         public bool fillin;
+        public float strokeThickness;
 
         public VectorBox(VectorPoint position, VectorPoint size, bool fillin) : base (position)
         {
