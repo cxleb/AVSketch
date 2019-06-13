@@ -20,6 +20,7 @@ namespace AVSketch
         public int height;
         public float transformX = 0;
         public float transformY = 0;
+        public float outlinePadding = 10;
         private SKSurface surface;
 
         private WriteableBitmap _bitmap;
@@ -71,21 +72,26 @@ namespace AVSketch
 
             foreach (KeyValuePair<string, VectorObject> obj in screen.objects)
             {
+                bool outline = false;
+                if(screen.outlinedObject == obj.Key)
+                {
+                    outline = true;
+                }
                 if (obj.Value is VectorBox)
                 {
-                    drawBox(canvas, obj.Value as VectorBox);
+                    drawBox(canvas, obj.Value as VectorBox, outline);
                 }
                 else if (obj.Value is VectorLine)
                 {
-                    drawLine(canvas, obj.Value as VectorLine);
+                    drawLine(canvas, obj.Value as VectorLine, outline);
                 }
                 else if (obj.Value is VectorEllipse)
                 {
-                    drawEllipse(canvas, obj.Value as VectorEllipse);
+                    drawEllipse(canvas, obj.Value as VectorEllipse, outline);
                 }
                 else if (obj.Value is VectorText)
                 {
-                    drawText(canvas, obj.Value as VectorText);
+                    drawText(canvas, obj.Value as VectorText, outline);
                 }
             }
 
@@ -106,30 +112,53 @@ namespace AVSketch
             return transformY - y * scale;
         }
 
-        private void drawLine(SKCanvas canvas, VectorLine line)
+        private void drawLine(SKCanvas canvas, VectorLine line, bool outline)
         {
+            SKPaint paint = new SKPaint();
+            paint.StrokeWidth = line.strokeThickness;
+            paint.Color = SKColor.Parse(line.colour);
+
             VectorPoint prevPoint = line.position;
             foreach(VectorPoint point in line.points)
             {
-                canvas.DrawLine(convertXCoord(prevPoint.x), convertYCoord(prevPoint.y), convertXCoord(point.x), convertYCoord(point.y), new SKPaint() { StrokeWidth = line.strokeThickness, Color = SKColor.Parse(line.colour)});
+                canvas.DrawLine(convertXCoord(prevPoint.x), convertYCoord(prevPoint.y), convertXCoord(point.x), convertYCoord(point.y), paint);
                 prevPoint = point;
             }
         }
 
-        private void drawBox(SKCanvas canvas, VectorBox box)
+        private void drawBox(SKCanvas canvas, VectorBox box, bool outline)
         {
+            SKPaint paint = new SKPaint();
+            paint.StrokeWidth = box.strokeThickness;
+            paint.Color = SKColor.Parse(box.colour);
+            paint.IsStroke = box.fillin;
 
-            canvas.DrawRect(convertXCoord(box.position.x), convertYCoord(box.position.y), box.size.x * scale, box.size.y * scale, new SKPaint() { StrokeWidth = box.strokeThickness, Color = SKColor.Parse(box.colour), IsStroke = box.fillin });
+            canvas.DrawRect(convertXCoord(box.position.x), convertYCoord(box.position.y), box.size.x * scale, box.size.y * scale, paint);
         }
 
-        private void drawEllipse(SKCanvas canvas, VectorEllipse ellipse)
+        private void drawEllipse(SKCanvas canvas, VectorEllipse ellipse, bool outline)
         {
-            canvas.DrawOval(convertXCoord(ellipse.position.x), convertYCoord(ellipse.position.y), ellipse.xRadius * scale, ellipse.yRadius * scale, new SKPaint() { StrokeWidth = ellipse.strokeThickness, Color = SKColor.Parse(ellipse.colour), IsStroke = ellipse.fillin });
+            SKPaint paint = new SKPaint();
+            paint.StrokeWidth = ellipse.strokeThickness;
+            paint.Color = SKColor.Parse(ellipse.colour);
+            paint.IsStroke = ellipse.fillin;
+
+            canvas.DrawOval(convertXCoord(ellipse.position.x), convertYCoord(ellipse.position.y), ellipse.xRadius * scale, ellipse.yRadius * scale, paint);
         }
 
-        private void drawText(SKCanvas canvas, VectorText text)
+        private void drawText(SKCanvas canvas, VectorText text, bool outline)
         {
-            canvas.DrawText(text.text, convertXCoord(text.position.x), convertYCoord(text.position.y), new SKPaint() { Color = SKColor.Parse(text.colour), TextSize = text.fontSize});
+            SKPaint paint = new SKPaint();
+            paint.Color = SKColor.Parse(text.colour);
+            paint.TextSize = text.fontSize;
+
+            canvas.DrawText(text.text, convertXCoord(text.position.x), convertYCoord(text.position.y), paint);
+            if (outline)
+            {
+                float size = paint.MeasureText(text.text + " ");
+                canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y), convertXCoord(text.position.x) + size, convertYCoord(text.position.y), new SKPaint() { StrokeWidth = 1, IsStroke = true});
+                canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y) - text.fontSize, convertXCoord(text.position.x) + size, convertYCoord(text.position.y) - text.fontSize, new SKPaint() { StrokeWidth = 1, IsStroke = true });
+            }
         }
 
     }

@@ -126,6 +126,7 @@ namespace AVSketch
                 screen.objects[tooluid].colour = screen.current_colour;
                 (screen.objects[tooluid] as VectorText).fontSize = fontSize;
                 tooling = true;
+                screen.outlinedObject = tooluid;
             }
 
         }
@@ -239,6 +240,7 @@ namespace AVSketch
         {
             activeTool = 0;
             tooling = false;
+            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -246,6 +248,7 @@ namespace AVSketch
         {
             activeTool = 1;
             tooling = false;
+            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -253,6 +256,7 @@ namespace AVSketch
         {
             activeTool = 2;
             tooling = false;
+            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -260,6 +264,7 @@ namespace AVSketch
         {
             activeTool = 3;
             tooling = false;
+            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -267,6 +272,7 @@ namespace AVSketch
         {
             activeTool = 4;
             tooling = false;
+            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -274,6 +280,7 @@ namespace AVSketch
         {
             activeTool = 5;
             tooling = false;
+            screen.outlinedObject = "";
             interpretTooling();
         }
 

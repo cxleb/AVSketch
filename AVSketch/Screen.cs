@@ -14,6 +14,7 @@ namespace AVSketch
         public string current_colour = "000000";
         public float translateX = 0f;
         public float translateY = 0f;
+        public string outlinedObject = "";
 
         public int oldtool = 0;
 
