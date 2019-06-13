@@ -9,6 +9,8 @@ namespace AVSketch.VectorModel
     class VectorText : VectorObject
     {
         public string text;
+        public float fontSize;
+
 
         public VectorText(VectorPoint point, string text) : base(point)
         {

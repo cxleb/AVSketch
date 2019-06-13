@@ -39,6 +39,8 @@ namespace AVSketch
 
         float strokeThickness = 5;
 
+        float fontSize = 24;
+
         Graphics graphics;
         Screen screen;
 
@@ -117,12 +119,23 @@ namespace AVSketch
                 prevX = x;
                 prevY = y;
             }
+            if(activeTool == 3)
+            {
+                tooluid = Environment.TickCount.ToString();
+                screen.addObject(tooluid, new VectorText(new VectorPoint(x, y), ""));
+                screen.objects[tooluid].colour = screen.current_colour;
+                (screen.objects[tooluid] as VectorText).fontSize = fontSize;
+                tooling = true;
+            }
 
         }
 
         private void ImageContainer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            tooling = false;
+            if (activeTool == 2 || activeTool == 1 || activeTool == 0)
+            {
+                tooling = false;
+            }
             if (activeTool == 2)
             {
                 float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
@@ -173,13 +186,29 @@ namespace AVSketch
 
         private void Window_TextInput(object sender, TextCompositionEventArgs e)
         {
-            //MessageBox.Show(e.Text);
+            if (tooling) 
+            {
+                if (activeTool == 3)
+                {
+                    if (e.Text == "\b")
+                    {
+                        if ((screen.objects[tooluid] as VectorText).text.Length > 0)
+                        {
+                            (screen.objects[tooluid] as VectorText).text = (screen.objects[tooluid] as VectorText).text.Remove((screen.objects[tooluid] as VectorText).text.Length - 1);
+                        }
+                    }
+                    else
+                    {
+                        (screen.objects[tooluid] as VectorText).text += e.Text;
+                    }
+                }
+            }
         }
 
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space && !e.IsRepeat)
+            if (e.Key == Key.Space && !e.IsRepeat && activeTool != 3 && !tooling)
             {
                 oldActiveTool = activeTool;
                 oldTooling = tooling;
@@ -190,13 +219,12 @@ namespace AVSketch
                 mouseOldY = Mouse.GetPosition(imageContainer).Y;
 
                 interpretTooling();
-
             }
         }
 
         private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Space && !e.IsRepeat)
+            if (e.Key == Key.Space && !e.IsRepeat && activeTool != 3)
             {
                 activeTool = oldActiveTool;
                 tooling = oldTooling;
@@ -210,42 +238,43 @@ namespace AVSketch
         private void Pan_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 0;
+            tooling = false;
             interpretTooling();
         }
 
         private void Shape_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 1;
+            tooling = false;
             interpretTooling();
-            imageContainer.Focus();
         }
 
         private void Line_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 2;
+            tooling = false;
             interpretTooling();
-            imageContainer.Focus();
         }
 
         private void Text_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 3;
+            tooling = false;
             interpretTooling();
-            imageContainer.Focus();
         }
 
         private void Transform_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 4;
+            tooling = false;
             interpretTooling();
-            imageContainer.Focus();
         }
 
         private void Delete_selector_Click(object sender, RoutedEventArgs e)
         {
             activeTool = 5;
+            tooling = false;
             interpretTooling();
-            imageContainer.Focus();
         }
 
         private void interpretTooling()
@@ -310,6 +339,33 @@ namespace AVSketch
                 fillin_check.Unchecked += (_o, _e) => current_fill_in = true;
                 fillin_check.Checked += (_o, _e) => current_fill_in = false;
                 tool_options_container.Children.Add(fillin_check);
+            }
+
+            if(activeTool == 3)
+            {
+                TextBlock sizeLabel = new TextBlock();
+                sizeLabel.Height = 24;
+                sizeLabel.Text = "Font Size:";
+                sizeLabel.Margin = new Thickness(5, 5, 5, 5);
+                tool_options_container.Children.Add(sizeLabel);
+
+                ComboBox sizeSelector = new ComboBox();
+                sizeSelector.Height = 24;
+                sizeSelector.Focusable = false;
+                //shapeSelector.HorizontalAlignment = HorizontalAlignment.Left;
+                sizeSelector.Items.Add(8f);
+                sizeSelector.Items.Add(9f);
+                sizeSelector.Items.Add(10f);
+                sizeSelector.Items.Add(11f);
+                sizeSelector.Items.Add(12f);
+                sizeSelector.Items.Add(24f);
+                sizeSelector.Items.Add(32f);
+                sizeSelector.Items.Add(48f);
+                sizeSelector.Items.Add(56f);
+                sizeSelector.Items.Add(78f);
+                sizeSelector.SelectedItem = fontSize;
+                sizeSelector.SelectionChanged += (_o, _e) => fontSize = (float)sizeSelector.SelectedItem;
+                tool_options_container.Children.Add(sizeSelector);
             }
         }
 

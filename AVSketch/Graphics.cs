@@ -129,7 +129,7 @@ namespace AVSketch
 
         private void drawText(SKCanvas canvas, VectorText text)
         {
-            canvas.DrawText(text.text, convertXCoord(text.position.x), convertYCoord(text.position.y), new SKPaint() { StrokeWidth = 5, Color = SKColor.Parse(text.colour), TextSize = 50});
+            canvas.DrawText(text.text, convertXCoord(text.position.x), convertYCoord(text.position.y), new SKPaint() { Color = SKColor.Parse(text.colour), TextSize = text.fontSize});
         }
 
     }
