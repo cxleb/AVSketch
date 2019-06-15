@@ -132,6 +132,7 @@ namespace AVSketch
                 prevX = x;
                 prevY = y;
                 screen.outlinedObject = tooluid;
+                (screen.objects[tooluid] as VectorLine).calculateMinMax();
             }
             if (activeTool == 3)
             {
@@ -155,9 +156,12 @@ namespace AVSketch
             {
                 float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
                 float y = (screen.translateY - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
-                (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x, y));
+                float dx = (screen.objects[tooluid] as VectorLine).position.x;
+                float dy = (screen.objects[tooluid] as VectorLine).position.y;
+                (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x - dx, y - dy));
+                (screen.objects[tooluid] as VectorLine).calculateMinMax();
             }
-            if(activeTool == 1)
+            if (activeTool == 1)
             {
                 if (screen.objects[tooluid] is VectorEllipse)
                 {
@@ -198,9 +202,12 @@ namespace AVSketch
                 {
                     if (Math.Abs(prevX - x) >= 1 || Math.Abs(prevY - y) >= 1)
                     {
-                        (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x, y));
+                        float dx = (screen.objects[tooluid] as VectorLine).position.x;
+                        float dy = (screen.objects[tooluid] as VectorLine).position.y;
+                        (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x - dx, y - dy));
                         prevX = x;
                         prevY = y;
+                        (screen.objects[tooluid] as VectorLine).calculateMinMax();
                     }
                 }
             }

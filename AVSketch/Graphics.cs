@@ -123,12 +123,24 @@ namespace AVSketch
             paint.StrokeWidth = line.strokeThickness;
             paint.Color = SKColor.Parse(line.colour);
 
-            VectorPoint prevPoint = line.position;
+            VectorPoint prevPoint = new VectorPoint(0,0);
+            float x = line.position.x;
+            float y = line.position.y;
 
-            foreach(VectorPoint point in line.points)
+
+            foreach (VectorPoint point in line.points)
             {
-                canvas.DrawLine(convertXCoord(prevPoint.x), convertYCoord(prevPoint.y), convertXCoord(point.x), convertYCoord(point.y), paint);
+                canvas.DrawLine(convertXCoord(prevPoint.x + x), convertYCoord(prevPoint.y + y), convertXCoord(point.x + x), convertYCoord(point.y + y), paint);
                 prevPoint = point;
+            }
+
+            if (outline)
+            {
+                float lx = convertXCoord(line.minX + line.position.x) - outlinePadding;
+                float ly = convertYCoord(line.maxY + line.position.y) - outlinePadding;
+                float w = (Math.Abs(line.maxX) + Math.Abs(line.minX)) * scale + (outlinePadding * 2);
+                float h = (Math.Abs(line.maxY) + Math.Abs(line.minY)) * scale + (outlinePadding * 2);
+                canvas.DrawRect(lx, ly, w, h, outlinePaint);
             }
         }
 

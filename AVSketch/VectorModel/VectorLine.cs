@@ -19,7 +19,6 @@ namespace AVSketch.VectorModel
         public VectorLine(VectorPoint start) : base(start)
         {
             points = new List<VectorPoint>();
-            points.Add(start);
         }
 
         public void addPoint(VectorPoint point)
@@ -29,10 +28,21 @@ namespace AVSketch.VectorModel
 
         public void calculateMinMax()
         {
-            
+            minX = 0f;
+            minY = 0f;
+            maxX = 0f;
+            maxY = 0f;
+
             foreach(VectorPoint p in points)
             {
-
+                if (p.x > maxX)
+                    maxX = p.x;
+                if (p.y > maxY)
+                    maxY = p.y;
+                if (p.x < minX)
+                    minX = p.x;
+                if (p.y < minY)
+                    minY = p.y;
             }
         }
     }
