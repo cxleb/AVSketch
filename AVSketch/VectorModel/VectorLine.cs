@@ -11,6 +11,11 @@ namespace AVSketch.VectorModel
         public List<VectorPoint> points;
         public float strokeThickness;
 
+        public float minX = 0f;
+        public float minY = 0f;
+        public float maxX = 0f;
+        public float maxY = 0f;
+
         public VectorLine(VectorPoint start) : base(start)
         {
             points = new List<VectorPoint>();
@@ -20,6 +25,15 @@ namespace AVSketch.VectorModel
         public void addPoint(VectorPoint point)
         {
             points.Add(point);
+        }
+
+        public void calculateMinMax()
+        {
+            
+            foreach(VectorPoint p in points)
+            {
+
+            }
         }
     }
 }

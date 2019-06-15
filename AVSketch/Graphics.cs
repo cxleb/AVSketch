@@ -20,8 +20,9 @@ namespace AVSketch
         public int height;
         public float transformX = 0;
         public float transformY = 0;
-        public float outlinePadding = 10;
+        public float outlinePadding = 5;
         private SKSurface surface;
+        private SKPaint outlinePaint;
 
         private WriteableBitmap _bitmap;
 
@@ -39,7 +40,11 @@ namespace AVSketch
 
         public Graphics()
         {
-            
+            outlinePaint = new SKPaint();
+            outlinePaint.StrokeWidth = 1;
+            outlinePaint.IsStroke = true;
+            outlinePaint.PathEffect = SKPathEffect.CreateDash(new float[] { 5, 5, 5, 5 }, 10);
+            outlinePaint.Color = SKColor.Parse("CCCCCC");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -119,6 +124,7 @@ namespace AVSketch
             paint.Color = SKColor.Parse(line.colour);
 
             VectorPoint prevPoint = line.position;
+
             foreach(VectorPoint point in line.points)
             {
                 canvas.DrawLine(convertXCoord(prevPoint.x), convertYCoord(prevPoint.y), convertXCoord(point.x), convertYCoord(point.y), paint);
@@ -134,6 +140,11 @@ namespace AVSketch
             paint.IsStroke = box.fillin;
 
             canvas.DrawRect(convertXCoord(box.position.x), convertYCoord(box.position.y), box.size.x * scale, box.size.y * scale, paint);
+
+            if (outline)
+            {
+                canvas.DrawRect(convertXCoord(box.position.x) - outlinePadding, convertYCoord(box.position.y) - outlinePadding, box.size.x * scale + (outlinePadding * 2), box.size.y * scale + (outlinePadding * 2), outlinePaint);
+            }
         }
 
         private void drawEllipse(SKCanvas canvas, VectorEllipse ellipse, bool outline)
@@ -144,6 +155,16 @@ namespace AVSketch
             paint.IsStroke = ellipse.fillin;
 
             canvas.DrawOval(convertXCoord(ellipse.position.x), convertYCoord(ellipse.position.y), ellipse.xRadius * scale, ellipse.yRadius * scale, paint);
+
+            if (outline)
+            {
+                // creates a box around the oval, does some calculations to get the position and size because theyre different for the different shapes
+                float x = convertXCoord(ellipse.position.x) - (ellipse.xRadius * scale) - outlinePadding;
+                float y = convertYCoord(ellipse.position.y) - (ellipse.yRadius * scale) - outlinePadding;
+                float w = (ellipse.xRadius * scale + outlinePadding) * 2;
+                float h = (ellipse.yRadius * scale + outlinePadding) * 2;
+                canvas.DrawRect(x, y, w, h, outlinePaint);
+            }
         }
 
         private void drawText(SKCanvas canvas, VectorText text, bool outline)
@@ -153,11 +174,13 @@ namespace AVSketch
             paint.TextSize = text.fontSize;
 
             canvas.DrawText(text.text, convertXCoord(text.position.x), convertYCoord(text.position.y), paint);
+
             if (outline)
             {
-                float size = paint.MeasureText(text.text + " ");
-                canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y), convertXCoord(text.position.x) + size, convertYCoord(text.position.y), new SKPaint() { StrokeWidth = 1, IsStroke = true});
-                canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y) - text.fontSize, convertXCoord(text.position.x) + size, convertYCoord(text.position.y) - text.fontSize, new SKPaint() { StrokeWidth = 1, IsStroke = true });
+                float size = paint.MeasureText(text.text + ",");
+                // experimental outline style, not really sure if it works super good
+                canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y), convertXCoord(text.position.x) + size, convertYCoord(text.position.y), outlinePaint);
+                canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y) - text.fontSize, convertXCoord(text.position.x) + size, convertYCoord(text.position.y) - text.fontSize, outlinePaint);
             }
         }
 

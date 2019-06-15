@@ -22,6 +22,18 @@ namespace AVSketch
     /// </summary>
     public partial class MainWindow : Window
     {
+        // TODO
+        // 1 - save/open
+        // 2 - undo/redo
+        // 3 - fix line algorithim, make the points based on the mouse acceleration not moving every ten pixels
+        // 4 - make all line points relaltive to the intial point, not relative to the screen, aka point pos - line pos
+        // 5 - add outlines too all objects
+        // 6 - replace transform too with object tool, aka 
+        // 7 - remove delete not, and incorporate it into the object tools
+        // 8 - tidy code up, make it more scalable?
+        // 9 - FUTURE GOALS -> take complete advantage of c# event driven nature and implement a completely event driven system, for super scalability
+        // 10 - fix VectorEllipse weird use of two size variables, aka go with the more scalable VectorPoint
+
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform, 5 - delete
         string tooluid;
 
@@ -108,6 +120,7 @@ namespace AVSketch
                 tooling = true;
                 prevX = x;
                 prevY = y;
+                screen.outlinedObject = tooluid;
             }
             if (activeTool == 2)
             {
@@ -118,8 +131,9 @@ namespace AVSketch
                 tooling = true;
                 prevX = x;
                 prevY = y;
+                screen.outlinedObject = tooluid;
             }
-            if(activeTool == 3)
+            if (activeTool == 3)
             {
                 tooluid = Environment.TickCount.ToString();
                 screen.addObject(tooluid, new VectorText(new VectorPoint(x, y), ""));
@@ -142,6 +156,13 @@ namespace AVSketch
                 float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
                 float y = (screen.translateY - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
                 (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x, y));
+            }
+            if(activeTool == 1)
+            {
+                if (screen.objects[tooluid] is VectorEllipse)
+                {
+                    //MessageBox.Show((screen.objects[tooluid] as VectorEllipse).xRadius + " " + (screen.objects[tooluid] as VectorEllipse).yRadius);
+                }
             }
         }
 
@@ -168,7 +189,7 @@ namespace AVSketch
                     }
                     else if (current_shape == "ellipse")
                     {
-                        (screen.objects[tooluid] as VectorEllipse).xRadius = (float)prevX - x;
+                        (screen.objects[tooluid] as VectorEllipse).xRadius = x - (float)prevX;
                         (screen.objects[tooluid] as VectorEllipse).yRadius = (float)prevY - y;
                         (screen.objects[tooluid] as VectorEllipse).fillin = current_fill_in;
                     }
