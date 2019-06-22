@@ -8,15 +8,13 @@ namespace AVSketch.VectorModel
 {
     class VectorEllipse : VectorObject
     {
-        public float xRadius;
-        public float yRadius;
+        public VectorPoint radii;
         public bool fillin;
         public float strokeThickness;
 
-        public VectorEllipse(VectorPoint point, float xRadius, float yRadius, bool fillin) : base(point)
+        public VectorEllipse(VectorPoint point, VectorPoint radii, bool fillin) : base(point)
         {
-            this.xRadius = xRadius;
-            this.yRadius = yRadius;
+            this.radii = radii;
             this.fillin = fillin;
         }
     }

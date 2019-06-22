@@ -11,6 +11,7 @@ namespace AVSketch.VectorModel
         public string text;
         public float fontSize;
 
+        public float width = 0;
 
         public VectorText(VectorPoint point, string text) : base(point)
         {

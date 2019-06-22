@@ -32,7 +32,8 @@ namespace AVSketch
         // 7 - remove delete not, and incorporate it into the object tools
         // 8 - tidy code up, make it more scalable?
         // 9 - FUTURE GOALS -> take complete advantage of c# event driven nature and implement a completely event driven system, for super scalability
-        // 10 - fix VectorEllipse weird use of two size variables, aka go with the more scalable VectorPoint
+        // 10 DONE - fix VectorEllipse weird use of two size variables, aka go with the more scalable VectorPoint
+        // 11 - add select tool algorithim
 
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform, 5 - delete
         string tooluid;
@@ -113,7 +114,7 @@ namespace AVSketch
                 }
                 else if (current_shape == "ellipse")
                 {
-                    screen.addObject(tooluid, new VectorEllipse(new VectorPoint(x, y), 1, 1, current_fill_in));
+                    screen.addObject(tooluid, new VectorEllipse(new VectorPoint(x, y), new VectorPoint(0.001f, 0.001f), current_fill_in));
                     (screen.objects[tooluid] as VectorEllipse).strokeThickness = strokeThickness;
                 }
                 screen.objects[tooluid].colour = screen.current_colour;
@@ -198,8 +199,8 @@ namespace AVSketch
                     }
                     else if (current_shape == "ellipse")
                     {
-                        (screen.objects[tooluid] as VectorEllipse).xRadius = x - (float)prevX;
-                        (screen.objects[tooluid] as VectorEllipse).yRadius = y - (float)prevY;
+                        (screen.objects[tooluid] as VectorEllipse).radii.x = x - (float)prevX;
+                        (screen.objects[tooluid] as VectorEllipse).radii.y = y - (float)prevY;
                         (screen.objects[tooluid] as VectorEllipse).fillin = current_fill_in;
                     }
                 }
@@ -273,7 +274,6 @@ namespace AVSketch
         {
             activeTool = 0;
             tooling = false;
-            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -281,7 +281,6 @@ namespace AVSketch
         {
             activeTool = 1;
             tooling = false;
-            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -289,7 +288,6 @@ namespace AVSketch
         {
             activeTool = 2;
             tooling = false;
-            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -297,7 +295,6 @@ namespace AVSketch
         {
             activeTool = 3;
             tooling = false;
-            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -305,7 +302,6 @@ namespace AVSketch
         {
             activeTool = 4;
             tooling = false;
-            screen.outlinedObject = "";
             interpretTooling();
         }
 
@@ -313,7 +309,6 @@ namespace AVSketch
         {
             activeTool = 5;
             tooling = false;
-            screen.outlinedObject = "";
             interpretTooling();
         }
 

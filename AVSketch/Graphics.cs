@@ -44,7 +44,7 @@ namespace AVSketch
             outlinePaint.StrokeWidth = 1;
             outlinePaint.IsStroke = true;
             outlinePaint.PathEffect = SKPathEffect.CreateDash(new float[] { 5, 5, 5, 5 }, 10);
-            outlinePaint.Color = SKColor.Parse("CCCCCC");
+            outlinePaint.Color = SKColor.Parse("999999");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -170,15 +170,15 @@ namespace AVSketch
             paint.Color = SKColor.Parse(ellipse.colour);
             paint.IsStroke = ellipse.fillin;
 
-            canvas.DrawOval(convertXCoord(ellipse.position.x), convertYCoord(ellipse.position.y), ellipse.xRadius * scale, ellipse.yRadius * scale, paint);
+            canvas.DrawOval(convertXCoord(ellipse.position.x), convertYCoord(ellipse.position.y), ellipse.radii.x * scale, ellipse.radii.y * scale, paint);
 
             if (outline)
             {
                 // creates a box around the oval, does some calculations to get the position and size because theyre different for the different shapes
-                float x = convertXCoord(ellipse.position.x) - (ellipse.xRadius * scale) - outlinePadding;
-                float y = convertYCoord(ellipse.position.y) - (ellipse.yRadius * scale) - outlinePadding;
-                float w = (ellipse.xRadius * scale + outlinePadding) * 2;
-                float h = (ellipse.yRadius * scale + outlinePadding) * 2;
+                float x = convertXCoord(ellipse.position.x) - (ellipse.radii.x * scale) - outlinePadding;
+                float y = convertYCoord(ellipse.position.y) - (ellipse.radii.y * scale) - outlinePadding;
+                float w = (ellipse.radii.x * scale + outlinePadding) * 2;
+                float h = (ellipse.radii.y * scale + outlinePadding) * 2;
                 canvas.DrawRect(x, y, w, h, outlinePaint);
             }
         }
@@ -191,9 +191,12 @@ namespace AVSketch
 
             canvas.DrawText(text.text, convertXCoord(text.position.x), convertYCoord(text.position.y), paint);
 
+            float size = paint.MeasureText(text.text + ",");
+            text.width = size;
+
             if (outline)
             {
-                float size = paint.MeasureText(text.text + ",");
+                
                 // experimental outline style, not really sure if it works super good
                 canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y), convertXCoord(text.position.x) + size, convertYCoord(text.position.y), outlinePaint);
                 canvas.DrawLine(convertXCoord(text.position.x), convertYCoord(text.position.y) - text.fontSize, convertXCoord(text.position.x) + size, convertYCoord(text.position.y) - text.fontSize, outlinePaint);
