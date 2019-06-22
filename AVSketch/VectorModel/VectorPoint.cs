@@ -43,6 +43,12 @@ namespace AVSketch.VectorModel
             this._y = y;
         }
 
+        public void add(float x, float y)
+        {
+            _x += x;
+            _y += y;
+        }
+
         public static VectorPoint AddPoints(VectorPoint a, VectorPoint b)
         {
             return new VectorPoint(a.x + b.x, a.y + b.y);

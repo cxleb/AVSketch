@@ -59,6 +59,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ActionManager.cs" />
     <Compile Include="ColourPicker.xaml.cs">
       <DependentUpon>ColourPicker.xaml</DependentUpon>
     </Compile>

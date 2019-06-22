@@ -20,7 +20,6 @@
                 <RowDefinition Height="40px"/>
                 <RowDefinition Height="40px"/>
                 <RowDefinition Height="40px"/>
-                <RowDefinition Height="40px"/>
                 <RowDefinition />
             </Grid.RowDefinitions>
             
@@ -28,9 +27,8 @@
             <Button x:Name="shape_selector" Grid.Row="1" Height='38px' Width='38px' Focusable="False" Click="Shape_selector_Click">shape</Button>
             <Button x:Name="line_selector" Grid.Row="2" Height='38px' Width='38px' Focusable="False" Click="Line_selector_Click">line</Button>
             <Button x:Name="text_selector" Grid.Row="3" Height='38px' Width='38px' Focusable="False" Click="Text_selector_Click">text</Button>
-            <Button x:Name="transform_selector" Grid.Row="4" Height='38px' Width='38px' Focusable="False" Click="Transform_selector_Click">transform</Button>
-            <Button x:Name="delete_selector" Grid.Row="5" Height='38px' Width='38px' Focusable="False" Click="Delete_selector_Click">delete</Button>
-            <Button x:Name="colour_selector" Grid.Row="6" Height="38px" Width="38px" Focusable="False" Click="Colour_selector_Click" ></Button>
+            <Button x:Name="transform_selector" Grid.Row="4" Height='38px' Width='38px' Focusable="False" Click="Transform_selector_Click">object</Button>
+            <Button x:Name="colour_selector" Grid.Row="5" Height="38px" Width="38px" Focusable="False" Click="Colour_selector_Click" ></Button>
         </Grid>
         <Grid x:Name="imaging_grid" Grid.Column="1">
             <Grid.RowDefinitions>

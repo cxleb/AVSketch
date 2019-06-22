@@ -28,14 +28,15 @@ namespace AVSketch
         // 3 - fix line algorithim, make the points based on the mouse acceleration not moving every ten pixels
         // DONE 4 - make all line points relaltive to the intial point, not relative to the screen, aka point pos - line pos
         // DONE 5 - add outlines too all objects
-        // 6 - replace transform too with object tool, aka 
-        // 7 - remove delete not, and incorporate it into the object tools
+        // DONE 6 - replace transform too with object tool, aka 
+        // DONE 7 - remove delete not, and incorporate it into the object tools
         // 8 - tidy code up, make it more scalable?
-        // 9 - FUTURE GOALS -> take complete advantage of c# event driven nature and implement a completely event driven system, for super scalability
-        // 10 DONE - fix VectorEllipse weird use of two size variables, aka go with the more scalable VectorPoint
-        // 11 - add select tool algorithim
+        // DONE 9 - fix VectorEllipse weird use of two size variables, aka go with the more scalable VectorPoint
+        // DONE 10 - add select tool algorithim
+        // 11 - ICONS
+        // FUTURE GOALS -> take complete advantage of c# event driven nature and implement a completely event driven system, for super scalability
 
-        int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform, 5 - delete
+        int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform
         string tooluid;
 
         double prevX = 0;
@@ -56,6 +57,7 @@ namespace AVSketch
 
         Graphics graphics;
         Screen screen;
+        ActionManager actions;
 
         public MainWindow()
         {
@@ -63,6 +65,7 @@ namespace AVSketch
 
             graphics = new Graphics();
             screen = new Screen();
+            actions = new ActionManager();
 
             graphics.CreateImage(800, 600);
             DataContext = graphics;
@@ -143,20 +146,35 @@ namespace AVSketch
                 (screen.objects[tooluid] as VectorText).fontSize = fontSize;
                 tooling = true;
                 screen.outlinedObject = tooluid;
+
+                actions.push(new Action(tooluid, ActionType.add, screen.objects[tooluid]));
             }
             if (activeTool == 4)
             {
+                screen.outlinedObject = "";
                 screen.findSelected(new VectorPoint(x, y));
                 tooling = true;
+                prevX = x;
+                prevY = y;
             }
 
         }
 
         private void ImageContainer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (activeTool == 4 || activeTool == 2 || activeTool == 1 || activeTool == 0)
+            if(activeTool == 0)
             {
                 tooling = false;
+            }
+            if(activeTool == 4)
+            {
+                tooling = false;
+                actions.push(new Action(screen.outlinedObject, ActionType.modify, screen.objects[screen.outlinedObject]));
+            }
+            if (activeTool == 2 || activeTool == 1)
+            {
+                tooling = false;
+                actions.push(new Action(screen.outlinedObject, ActionType.add, screen.objects[screen.outlinedObject]));
             }
             if (activeTool == 2)
             {
@@ -166,13 +184,6 @@ namespace AVSketch
                 float dy = (screen.objects[tooluid] as VectorLine).position.y;
                 (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x - dx, y - dy));
                 (screen.objects[tooluid] as VectorLine).calculateMinMax();
-            }
-            if (activeTool == 1)
-            {
-                if (screen.objects[tooluid] is VectorEllipse)
-                {
-                    //MessageBox.Show((screen.objects[tooluid] as VectorEllipse).xRadius + " " + (screen.objects[tooluid] as VectorEllipse).yRadius);
-                }
             }
         }
 
@@ -216,6 +227,12 @@ namespace AVSketch
                         (screen.objects[tooluid] as VectorLine).calculateMinMax();
                     }
                 }
+                if(activeTool == 4 && screen.outlinedObject != "")
+                {
+                    screen.objects[screen.outlinedObject].position.add(x - (float)prevX, y - (float)prevY);
+                    prevX = x;
+                    prevY = y;
+                }
             }
         }
 
@@ -230,11 +247,13 @@ namespace AVSketch
                         if ((screen.objects[tooluid] as VectorText).text.Length > 0)
                         {
                             (screen.objects[tooluid] as VectorText).text = (screen.objects[tooluid] as VectorText).text.Remove((screen.objects[tooluid] as VectorText).text.Length - 1);
+                            actions.push(new Action(tooluid, ActionType.modify, screen.objects[tooluid]));
                         }
                     }
                     else
                     {
                         (screen.objects[tooluid] as VectorText).text += e.Text;
+                        actions.push(new Action(tooluid, ActionType.modify, screen.objects[tooluid]));
                     }
                 }
             }
@@ -254,6 +273,36 @@ namespace AVSketch
                 mouseOldY = Mouse.GetPosition(imageContainer).Y;
 
                 interpretTooling();
+            }
+            if(e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                if(!e.IsRepeat && screen.outlinedObject != "" && activeTool != 3)
+                {
+                    screen.objects.Remove(screen.outlinedObject);
+                    actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
+                }
+            }
+            if (e.Key == Key.Z)
+            {
+                if (!e.IsRepeat && screen.outlinedObject != "" && activeTool != 3)
+                {
+                    Action action = actions.undo();
+                    if(action != null)
+                    {
+                        if(action.type == ActionType.delete)
+                        {
+                            screen.objects.Add(action.uid, action.obj);
+                        }
+                        if (action.type == ActionType.modify)
+                        {
+                            screen.objects[action.uid] = action.obj;
+                        }
+                        if(action.type == ActionType.add)
+                        {
+                            screen.objects.Remove(action.uid);
+                        }
+                    }
+                }
             }
         }
 
@@ -305,13 +354,6 @@ namespace AVSketch
             interpretTooling();
         }
 
-        private void Delete_selector_Click(object sender, RoutedEventArgs e)
-        {
-            activeTool = 5;
-            tooling = false;
-            interpretTooling();
-        }
-
         private void interpretTooling()
         {
             pan_selector.Background = activeTool == 0 ? Brushes.LightGray : Brushes.DarkGray;
@@ -319,8 +361,7 @@ namespace AVSketch
             line_selector.Background = activeTool == 2 ? Brushes.LightGray : Brushes.DarkGray;
             text_selector.Background = activeTool == 3 ? Brushes.LightGray : Brushes.DarkGray;
             transform_selector.Background = activeTool == 4 ? Brushes.LightGray : Brushes.DarkGray;
-            delete_selector.Background = activeTool == 5 ? Brushes.LightGray : Brushes.DarkGray;
-
+            
             tool_options_container.Children.RemoveRange(0, tool_options_container.Children.Count);
 
             if(activeTool == 1 || activeTool == 2)
