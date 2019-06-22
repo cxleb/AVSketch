@@ -34,6 +34,7 @@ namespace AVSketch
         // DONE 9 - fix VectorEllipse weird use of two size variables, aka go with the more scalable VectorPoint
         // DONE 10 - add select tool algorithim
         // 11 - ICONS
+        // 12 - copy paste cut fuck
         // FUTURE GOALS -> take complete advantage of c# event driven nature and implement a completely event driven system, for super scalability
 
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform
@@ -469,5 +470,7 @@ namespace AVSketch
             var brush = new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
             colour_selector.Background = brush;
         }
+
+        // MENU BAR BUTTON HANDLERS
     }
 }

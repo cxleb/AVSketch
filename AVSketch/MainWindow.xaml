@@ -7,12 +7,38 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" TextInput="Window_TextInput" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
     <Grid x:Name="mainGrid">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20px"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40px"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <Grid>
+        <StackPanel Grid.ColumnSpan="2">
+            <Menu>
+                <MenuItem Header="File">
+                    <MenuItem Header="New"/>
+                    <MenuItem Header="Open"/>
+                    <MenuItem Header="Save"/>
+                    <Separator />
+                    <MenuItem Header="Exit"/>
+                </MenuItem>
+                <MenuItem Header="Edit">
+                    <MenuItem Header="Undo"/>
+                    <MenuItem Header="Redo"/>
+                    <Separator />
+                    <MenuItem Header="Copy"/>
+                    <MenuItem Header="Paste"/>
+                    <MenuItem Header="Cut"/>
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40px"/>
                 <RowDefinition Height="40px"/>
@@ -30,7 +56,7 @@
             <Button x:Name="transform_selector" Grid.Row="4" Height='38px' Width='38px' Focusable="False" Click="Transform_selector_Click">object</Button>
             <Button x:Name="colour_selector" Grid.Row="5" Height="38px" Width="38px" Focusable="False" Click="Colour_selector_Click" ></Button>
         </Grid>
-        <Grid x:Name="imaging_grid" Grid.Column="1">
+        <Grid x:Name="imaging_grid" Grid.Column="1" Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="24px"/>
                 <RowDefinition />
