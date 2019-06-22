@@ -114,7 +114,7 @@ namespace AVSketch
 
         private float convertYCoord(float y)
         {
-            return transformY - y * scale;
+            return transformY + y * scale;
         }
 
         private void drawLine(SKCanvas canvas, VectorLine line, bool outline)
@@ -137,7 +137,7 @@ namespace AVSketch
             if (outline)
             {
                 float lx = convertXCoord(line.minX + line.position.x) - outlinePadding;
-                float ly = convertYCoord(line.maxY + line.position.y) - outlinePadding;
+                float ly = convertYCoord(line.minY + line.position.y) - outlinePadding;
                 float w = (Math.Abs(line.maxX) + Math.Abs(line.minX)) * scale + (outlinePadding * 2);
                 float h = (Math.Abs(line.maxY) + Math.Abs(line.minY)) * scale + (outlinePadding * 2);
                 canvas.DrawRect(lx, ly, w, h, outlinePaint);
@@ -155,7 +155,11 @@ namespace AVSketch
 
             if (outline)
             {
-                canvas.DrawRect(convertXCoord(box.position.x) - outlinePadding, convertYCoord(box.position.y) - outlinePadding, box.size.x * scale + (outlinePadding * 2), box.size.y * scale + (outlinePadding * 2), outlinePaint);
+                float lx = convertXCoord(box.position.x) - outlinePadding;
+                float ly = convertYCoord(box.position.y) - outlinePadding;
+                float w = box.size.x * scale + (outlinePadding * 2);
+                float h = box.size.y * scale + (outlinePadding * 2);
+                canvas.DrawRect(lx, ly, w, h, outlinePaint);
             }
         }
 

@@ -26,6 +26,34 @@ namespace AVSketch
         public void addObject(string uid, VectorObject _object)
         {
             objects[uid] = _object;
+
+        }
+
+        public void findSelected(VectorPoint seletedPoint)
+        {
+            foreach (KeyValuePair<string, VectorObject> obj in objects)
+            {
+                if (obj.Value is VectorBox)
+                {
+                    VectorBox box = obj.Value as VectorBox;
+                    if(box.position.x <= seletedPoint.x && box.position.x + box.size.x >= seletedPoint.x)
+                    {
+                        if (box.position.y <= seletedPoint.y && box.position.y - box.size.y >= seletedPoint.y)
+                        {
+                            outlinedObject = obj.Key;
+                        }
+                    }
+                }
+                else if (obj.Value is VectorLine)
+                {
+                }
+                else if (obj.Value is VectorEllipse)
+                {
+                }
+                else if (obj.Value is VectorText)
+                {
+                }
+            }
         }
     }
 }

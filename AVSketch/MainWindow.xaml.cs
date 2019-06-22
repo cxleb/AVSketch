@@ -26,8 +26,8 @@ namespace AVSketch
         // 1 - save/open
         // 2 - undo/redo
         // 3 - fix line algorithim, make the points based on the mouse acceleration not moving every ten pixels
-        // 4 - make all line points relaltive to the intial point, not relative to the screen, aka point pos - line pos
-        // 5 - add outlines too all objects
+        // DONE 4 - make all line points relaltive to the intial point, not relative to the screen, aka point pos - line pos
+        // DONE 5 - add outlines too all objects
         // 6 - replace transform too with object tool, aka 
         // 7 - remove delete not, and incorporate it into the object tools
         // 8 - tidy code up, make it more scalable?
@@ -96,7 +96,7 @@ namespace AVSketch
         private void ImageContainer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
-            float y = (screen.translateY - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
+            float y = ((float)e.GetPosition(imageContainer).Y - screen.translateY) / Graphics.scale;
             if (activeTool == 0)
             {
                 mouseOldX = e.GetPosition(imageContainer).X;
@@ -143,19 +143,24 @@ namespace AVSketch
                 tooling = true;
                 screen.outlinedObject = tooluid;
             }
+            if (activeTool == 4)
+            {
+                screen.findSelected(new VectorPoint(x, y));
+                tooling = true;
+            }
 
         }
 
         private void ImageContainer_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (activeTool == 2 || activeTool == 1 || activeTool == 0)
+            if (activeTool == 4 || activeTool == 2 || activeTool == 1 || activeTool == 0)
             {
                 tooling = false;
             }
             if (activeTool == 2)
             {
                 float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
-                float y = (screen.translateY - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
+                float y = ((float)e.GetPosition(imageContainer).Y - screen.translateY) / Graphics.scale;
                 float dx = (screen.objects[tooluid] as VectorLine).position.x;
                 float dy = (screen.objects[tooluid] as VectorLine).position.y;
                 (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x - dx, y - dy));
@@ -175,7 +180,7 @@ namespace AVSketch
             if (tooling)
             {
                 float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
-                float y = (screen.translateY - (float)e.GetPosition(imageContainer).Y) / Graphics.scale;
+                float y = ((float)e.GetPosition(imageContainer).Y - screen.translateY) / Graphics.scale;
                 if (activeTool == 0)
                 {
                     screen.translateX -= (float)( mouseOldX - e.GetPosition(imageContainer).X);
@@ -188,13 +193,13 @@ namespace AVSketch
                     if (current_shape == "box")
                     {
                         (screen.objects[tooluid] as VectorBox).size.x = x - (float)prevX;
-                        (screen.objects[tooluid] as VectorBox).size.y = (float)prevY - y ;
+                        (screen.objects[tooluid] as VectorBox).size.y = y - (float)prevY;
                         (screen.objects[tooluid] as VectorBox).fillin = current_fill_in;
                     }
                     else if (current_shape == "ellipse")
                     {
                         (screen.objects[tooluid] as VectorEllipse).xRadius = x - (float)prevX;
-                        (screen.objects[tooluid] as VectorEllipse).yRadius = (float)prevY - y;
+                        (screen.objects[tooluid] as VectorEllipse).yRadius = y - (float)prevY;
                         (screen.objects[tooluid] as VectorEllipse).fillin = current_fill_in;
                     }
                 }
