@@ -6,6 +6,23 @@
         xmlns:local="clr-namespace:AVSketch"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="800" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" TextInput="Window_TextInput" PreviewKeyDown="Window_PreviewKeyDown" PreviewKeyUp="Window_PreviewKeyUp">
+    
+    <Window.CommandBindings>
+        <CommandBinding x:Name="newCommand" Command="New" Executed="NewCommand_Executed"/>
+        <CommandBinding x:Name="openCommand" Command="Open" Executed="OpenCommand_Executed"/>
+        <CommandBinding x:Name="saveCommand" Command="Save" Executed="SaveCommand_Executed" />
+        <CommandBinding x:Name="undoCommand" Command="Undo" Executed="UndoCommand_Executed" />
+        <CommandBinding x:Name="redoCommand" Command="Redo" Executed="RedoCommand_Executed" />
+        <CommandBinding x:Name="copyCommand" Command="Copy" Executed="CopyCommand_Executed" />
+        <CommandBinding x:Name="cutCommand" Command="Cut" Executed="CutCommand_Executed" />
+        <CommandBinding x:Name="pasteCommand" Command="Paste" Executed="PasteCommand_Executed" />
+        <CommandBinding x:Name="deleteCommand" Command="Delete" Executed="DeleteCommand_Executed" />
+    </Window.CommandBindings>
+    
+    <Window.InputBindings>
+        
+    </Window.InputBindings>
+
     <Grid x:Name="mainGrid">
 
         <Grid.RowDefinitions>
@@ -21,19 +38,21 @@
         <StackPanel Grid.ColumnSpan="2">
             <Menu>
                 <MenuItem Header="File">
-                    <MenuItem Header="New"/>
-                    <MenuItem Header="Open"/>
-                    <MenuItem Header="Save"/>
+                    <MenuItem Header="New" Command="New"/>
+                    <MenuItem Header="Open" Command="Open"/>
+                    <MenuItem Header="Save" Command="Save"/>
                     <Separator />
                     <MenuItem Header="Exit"/>
                 </MenuItem>
                 <MenuItem Header="Edit">
-                    <MenuItem Header="Undo"/>
-                    <MenuItem Header="Redo"/>
+                    <MenuItem Header="Undo" Command="Undo"/>
+                    <MenuItem Header="Redo" Command="Redo"/>
                     <Separator />
-                    <MenuItem Header="Copy"/>
-                    <MenuItem Header="Paste"/>
-                    <MenuItem Header="Cut"/>
+                    <MenuItem Header="Copy" Command="Copy"/>
+                    <MenuItem Header="Paste" Command="Paste"/>
+                    <MenuItem Header="Cut" Command="Cut"/>
+                    <Separator/>
+                    <MenuItem Header="Delete" Command="Delete"/>
                 </MenuItem>
             </Menu>
         </StackPanel>

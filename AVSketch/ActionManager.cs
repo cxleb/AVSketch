@@ -48,17 +48,21 @@ namespace AVSketch
 
         public Action undo()
         {
-            if(pointer > 0)
+            if (pointer > 0)
+            {
                 pointer--;
-            return stack[pointer];
+                //print();
+                return stack[pointer];
+            }
+            return null;
         }
 
         public Action redo()
         {
             if(pointer >= stack.Count)
                 return null;
-            return stack[pointer++];
+            pointer++;
+            return stack[pointer-1];
         }
-        
     }
 }

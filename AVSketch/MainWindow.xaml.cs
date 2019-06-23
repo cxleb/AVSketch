@@ -59,6 +59,7 @@ namespace AVSketch
         Graphics graphics;
         Screen screen;
         ActionManager actions;
+        Clipboard clipboard;
 
         public MainWindow()
         {
@@ -67,6 +68,7 @@ namespace AVSketch
             graphics = new Graphics();
             screen = new Screen();
             actions = new ActionManager();
+            clipboard = new Clipboard();
 
             graphics.CreateImage(800, 600);
             DataContext = graphics;
@@ -170,7 +172,10 @@ namespace AVSketch
             if(activeTool == 4)
             {
                 tooling = false;
-                actions.push(new Action(screen.outlinedObject, ActionType.modify, screen.objects[screen.outlinedObject]));
+                if (screen.outlinedObject != "")
+                {
+                    actions.push(new Action(screen.outlinedObject, ActionType.modify, screen.objects[screen.outlinedObject]));
+                }
             }
             if (activeTool == 2 || activeTool == 1)
             {
@@ -274,36 +279,6 @@ namespace AVSketch
                 mouseOldY = Mouse.GetPosition(imageContainer).Y;
 
                 interpretTooling();
-            }
-            if(e.Key == Key.Delete || e.Key == Key.Back)
-            {
-                if(!e.IsRepeat && screen.outlinedObject != "" && activeTool != 3)
-                {
-                    screen.objects.Remove(screen.outlinedObject);
-                    actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
-                }
-            }
-            if (e.Key == Key.Z)
-            {
-                if (!e.IsRepeat && screen.outlinedObject != "" && activeTool != 3)
-                {
-                    Action action = actions.undo();
-                    if(action != null)
-                    {
-                        if(action.type == ActionType.delete)
-                        {
-                            screen.objects.Add(action.uid, action.obj);
-                        }
-                        if (action.type == ActionType.modify)
-                        {
-                            screen.objects[action.uid] = action.obj;
-                        }
-                        if(action.type == ActionType.add)
-                        {
-                            screen.objects.Remove(action.uid);
-                        }
-                    }
-                }
             }
         }
 
@@ -471,6 +446,96 @@ namespace AVSketch
             colour_selector.Background = brush;
         }
 
-        // MENU BAR BUTTON HANDLERS
+        // Command Bindings
+
+        private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        private void UndoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Action action = actions.undo();
+            if (action != null)
+            {
+                if (action.type == ActionType.delete)
+                {
+                    screen.objects.Add(action.uid, action.obj);
+                }
+                if (action.type == ActionType.modify)
+                {
+                    screen.objects[action.uid] = action.obj;
+                }
+                if (action.type == ActionType.add)
+                {
+                    screen.objects.Remove(action.uid);
+                }
+            }
+        }
+
+        private void RedoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Action action = actions.redo();
+            if (action != null)
+            {
+                if (action.type == ActionType.delete)
+                {
+                    screen.objects.Remove(action.uid);
+                }
+                if (action.type == ActionType.modify)
+                {
+                    screen.objects[action.uid] = action.obj;
+                }
+                if (action.type == ActionType.add)
+                {
+                    screen.objects.Add(action.uid, action.obj);
+                }
+            }
+        }
+
+        private void CopyCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (screen.outlinedObject != null)
+            {
+                clipboard.obj = screen.objects[screen.outlinedObject];
+                clipboard.clipped = true;
+            }
+        }
+
+        private void CutCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (screen.outlinedObject != null)
+            {
+                clipboard.obj = screen.objects[screen.outlinedObject];
+                screen.objects.Remove(screen.outlinedObject);
+                clipboard.clipped = true;
+            }
+        }
+
+        private void PasteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (clipboard.clipped)
+            {
+                screen.outlinedObject = Environment.TickCount.ToString();
+                screen.objects.Add(screen.outlinedObject, clipboard.obj);
+                screen.objects[screen.outlinedObject].position.add(2f, 2f);
+            }
+        }
+
+        private void DeleteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
+            screen.objects.Remove(screen.outlinedObject);
+        }
     }
 }
