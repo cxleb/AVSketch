@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AVSketch.VectorModel
 {
-    class VectorBox : VectorObject
+    public class VectorBox : VectorObject
     {
         public VectorPoint size;
         public bool fillin;
@@ -16,6 +16,14 @@ namespace AVSketch.VectorModel
         {
             this.size = size;
             this.fillin = fillin;
+        }
+
+        public override VectorObject Clone()
+        {
+            VectorBox box = new VectorBox(position.Clone(), size.Clone(), fillin);
+            box.colour = (string)this.colour.Clone();
+            box.strokeThickness = strokeThickness;
+            return box;
         }
     }
 }

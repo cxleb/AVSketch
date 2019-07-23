@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AVSketch.VectorModel
 {
-    class VectorLine : VectorObject
+    public class VectorLine : VectorObject
     {
         public List<VectorPoint> points;
         public float strokeThickness;
@@ -44,6 +44,19 @@ namespace AVSketch.VectorModel
                 if (p.y < minY)
                     minY = p.y;
             }
+        }
+
+        public override VectorObject Clone()
+        {
+            VectorLine line = new VectorLine(position.Clone());
+            line.colour = (string)this.colour.Clone();
+            line.strokeThickness = strokeThickness;
+            points.ForEach(x => line.addPoint(x.Clone()));
+            line.maxX = maxX;
+            line.maxY = maxY;
+            line.minX = minX;
+            line.minY = minY;
+            return line;
         }
     }
 }

@@ -11,6 +11,7 @@
         <CommandBinding x:Name="newCommand" Command="New" Executed="NewCommand_Executed"/>
         <CommandBinding x:Name="openCommand" Command="Open" Executed="OpenCommand_Executed"/>
         <CommandBinding x:Name="saveCommand" Command="Save" Executed="SaveCommand_Executed" />
+        <CommandBinding x:Name="saveAsCommand" Command="SaveAs" Executed="SaveAsCommand_Executed" />
         <CommandBinding x:Name="undoCommand" Command="Undo" Executed="UndoCommand_Executed" />
         <CommandBinding x:Name="redoCommand" Command="Redo" Executed="RedoCommand_Executed" />
         <CommandBinding x:Name="copyCommand" Command="Copy" Executed="CopyCommand_Executed" />
@@ -41,6 +42,7 @@
                     <MenuItem Header="New" Command="New"/>
                     <MenuItem Header="Open" Command="Open"/>
                     <MenuItem Header="Save" Command="Save"/>
+                    <MenuItem Header="Save As" Command="SaveAs"/>
                     <Separator />
                     <MenuItem Header="Exit"/>
                 </MenuItem>

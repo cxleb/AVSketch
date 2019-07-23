@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AVSketch.VectorModel
 {
-    class VectorText : VectorObject
+    public class VectorText : VectorObject
     {
         public string text;
         public float fontSize;
@@ -16,6 +16,14 @@ namespace AVSketch.VectorModel
         public VectorText(VectorPoint point, string text) : base(point)
         {
             this.text = text;
+        }
+
+        public override VectorObject Clone()
+        {
+            VectorText _text = new VectorText(position.Clone(), text.Clone().ToString());
+            _text.fontSize = fontSize;
+            _text.width = width;
+            return _text;
         }
     }
 }

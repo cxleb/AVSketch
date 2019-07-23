@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AVSketch.VectorModel
 {
     //used internally to define points within the vector space of the program
-    class VectorPoint
+    public class VectorPoint
     {
         // the private values of the point, this is comparable to a vector2f
         private float _x;
@@ -42,6 +42,12 @@ namespace AVSketch.VectorModel
             this._x = x;
             this._y = y;
         }
+
+        public VectorPoint Clone()
+        {
+            return new VectorPoint(_x, _y);
+        }
+
 
         public void add(float x, float y)
         {

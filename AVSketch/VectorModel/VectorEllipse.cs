@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AVSketch.VectorModel
 {
-    class VectorEllipse : VectorObject
+    public class VectorEllipse : VectorObject
     {
         public VectorPoint radii;
         public bool fillin;
@@ -16,6 +16,14 @@ namespace AVSketch.VectorModel
         {
             this.radii = radii;
             this.fillin = fillin;
+        }
+
+        public override VectorObject Clone()
+        {
+            VectorEllipse box = new VectorEllipse(position.Clone(), radii.Clone(), fillin);
+            box.colour = (string)this.colour.Clone();
+            box.strokeThickness = strokeThickness;
+            return box;
         }
     }
 }

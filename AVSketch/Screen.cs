@@ -9,13 +9,16 @@ using SkiaSharp;
 
 namespace AVSketch
 {
-    class Screen
+    public class Screen
     {
         public Dictionary<string, VectorObject> objects;
         public string current_colour = "000000";
         public float translateX = 0f;
         public float translateY = 0f;
         public string outlinedObject = "";
+        public float stroke_thickness = 5f;
+        public float font_size = 24f;
+        public bool current_fill_in = true;
 
         public int oldtool = 0;
 

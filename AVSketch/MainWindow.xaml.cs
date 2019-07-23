@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using Microsoft.Win32;
 using AVSketch.VectorModel;
 
 namespace AVSketch
@@ -23,18 +23,12 @@ namespace AVSketch
     public partial class MainWindow : Window
     {
         // TODO
-        // 1 - save/open
-        // 2 - undo/redo
         // 3 - fix line algorithim, make the points based on the mouse acceleration not moving every ten pixels
-        // DONE 4 - make all line points relaltive to the intial point, not relative to the screen, aka point pos - line pos
-        // DONE 5 - add outlines too all objects
-        // DONE 6 - replace transform too with object tool, aka 
-        // DONE 7 - remove delete not, and incorporate it into the object tools
         // 8 - tidy code up, make it more scalable?
-        // DONE 9 - fix VectorEllipse weird use of two size variables, aka go with the more scalable VectorPoint
-        // DONE 10 - add select tool algorithim
-        // 11 - ICONS
-        // 12 - copy paste cut fuck
+        // 11 - ICONS (text is nice its easily readable)
+        // 13 - create a method for generating unqiue keys, aka do not rely on tooluid = Environment.TickCount.ToString();
+        // 14 - replace tooluid to screen.outlinedObject
+        // 15 - fix variable size fromThisFormat to_this_format
         // FUTURE GOALS -> take complete advantage of c# event driven nature and implement a completely event driven system, for super scalability
 
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform
@@ -45,17 +39,13 @@ namespace AVSketch
         double mouseOldX = 0;
         double mouseOldY = 0;
         bool tooling = false;
-
         bool oldTooling = false;
         int oldActiveTool = 2;
-
         string current_shape = "box";
-        bool current_fill_in = true;
 
-        float strokeThickness = 5;
-
-        float fontSize = 24;
-
+        bool alreadySaved = false;
+        string name = "";
+        
         Graphics graphics;
         Screen screen;
         ActionManager actions;
@@ -67,8 +57,6 @@ namespace AVSketch
 
             graphics = new Graphics();
             screen = new Screen();
-            actions = new ActionManager();
-            clipboard = new Clipboard();
 
             graphics.CreateImage(800, 600);
             DataContext = graphics;
@@ -78,15 +66,27 @@ namespace AVSketch
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            load();
+            fixTitle();
+        }
+
+        private void load()
+        {
             int width = (int)imaging_grid.ActualWidth;
             int height = (int)imaging_grid.RowDefinitions[1].ActualHeight;
             graphics.CreateImage(width, height);
             screen.translateX = graphics.width / 2f;
             screen.translateY = graphics.height / 2f;
 
+            actions = new ActionManager();
+            clipboard = new Clipboard();
+
             interpretTooling();
             update_colour();
-
+        }
+        private void fixTitle()
+        {
+            this.Title = "AVSketch " + name;
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -115,13 +115,13 @@ namespace AVSketch
                 tooluid = Environment.TickCount.ToString();
                 if (current_shape == "box")
                 {
-                    screen.addObject(tooluid, new VectorBox(new VectorPoint(x, y), new VectorPoint(1,1), current_fill_in));
-                    (screen.objects[tooluid] as VectorBox).strokeThickness = strokeThickness;
+                    screen.addObject(tooluid, new VectorBox(new VectorPoint(x, y), new VectorPoint(1,1), screen.current_fill_in));
+                    (screen.objects[tooluid] as VectorBox).strokeThickness = screen.stroke_thickness;
                 }
                 else if (current_shape == "ellipse")
                 {
-                    screen.addObject(tooluid, new VectorEllipse(new VectorPoint(x, y), new VectorPoint(0.001f, 0.001f), current_fill_in));
-                    (screen.objects[tooluid] as VectorEllipse).strokeThickness = strokeThickness;
+                    screen.addObject(tooluid, new VectorEllipse(new VectorPoint(x, y), new VectorPoint(0.001f, 0.001f), screen.current_fill_in));
+                    (screen.objects[tooluid] as VectorEllipse).strokeThickness = screen.stroke_thickness;
                 }
                 screen.objects[tooluid].colour = screen.current_colour;
                 tooling = true;
@@ -134,7 +134,7 @@ namespace AVSketch
                 tooluid = Environment.TickCount.ToString();
                 screen.addObject(tooluid, new VectorLine(new VectorPoint(x, y)));
                 screen.objects[tooluid].colour = screen.current_colour;
-                (screen.objects[tooluid] as VectorLine).strokeThickness = strokeThickness;
+                (screen.objects[tooluid] as VectorLine).strokeThickness = screen.stroke_thickness;
                 tooling = true;
                 prevX = x;
                 prevY = y;
@@ -146,7 +146,7 @@ namespace AVSketch
                 tooluid = Environment.TickCount.ToString();
                 screen.addObject(tooluid, new VectorText(new VectorPoint(x, y), ""));
                 screen.objects[tooluid].colour = screen.current_colour;
-                (screen.objects[tooluid] as VectorText).fontSize = fontSize;
+                (screen.objects[tooluid] as VectorText).fontSize = screen.font_size;
                 tooling = true;
                 screen.outlinedObject = tooluid;
 
@@ -212,13 +212,13 @@ namespace AVSketch
                     {
                         (screen.objects[tooluid] as VectorBox).size.x = x - (float)prevX;
                         (screen.objects[tooluid] as VectorBox).size.y = y - (float)prevY;
-                        (screen.objects[tooluid] as VectorBox).fillin = current_fill_in;
+                        (screen.objects[tooluid] as VectorBox).fillin = screen.current_fill_in;
                     }
                     else if (current_shape == "ellipse")
                     {
                         (screen.objects[tooluid] as VectorEllipse).radii.x = x - (float)prevX;
                         (screen.objects[tooluid] as VectorEllipse).radii.y = y - (float)prevY;
-                        (screen.objects[tooluid] as VectorEllipse).fillin = current_fill_in;
+                        (screen.objects[tooluid] as VectorEllipse).fillin = screen.current_fill_in;
                     }
                 }
                 if (activeTool == 2)
@@ -361,8 +361,8 @@ namespace AVSketch
                 strokeSelector.Items.Add(8f);
                 strokeSelector.Items.Add(9f);
                 strokeSelector.Items.Add(10f);
-                strokeSelector.SelectedItem = strokeThickness;
-                strokeSelector.SelectionChanged += (_o, _e) => strokeThickness = (float)strokeSelector.SelectedItem;
+                strokeSelector.SelectedItem = screen.stroke_thickness;
+                strokeSelector.SelectionChanged += (_o, _e) => screen.stroke_thickness = (float)strokeSelector.SelectedItem;
                 tool_options_container.Children.Add(strokeSelector);
             }
 
@@ -387,9 +387,9 @@ namespace AVSketch
                 fillin_check.Margin = new Thickness(5, 5, 5, 5);
                 //fillin_check.HorizontalAlignment = HorizontalAlignment.Left;
                 fillin_check.Content = "fill in";
-                fillin_check.IsChecked = !current_fill_in;
-                fillin_check.Unchecked += (_o, _e) => current_fill_in = true;
-                fillin_check.Checked += (_o, _e) => current_fill_in = false;
+                fillin_check.IsChecked = !screen.current_fill_in;
+                fillin_check.Unchecked += (_o, _e) => screen.current_fill_in = true;
+                fillin_check.Checked += (_o, _e) => screen.current_fill_in = false;
                 tool_options_container.Children.Add(fillin_check);
             }
 
@@ -415,8 +415,8 @@ namespace AVSketch
                 sizeSelector.Items.Add(48f);
                 sizeSelector.Items.Add(56f);
                 sizeSelector.Items.Add(78f);
-                sizeSelector.SelectedItem = fontSize;
-                sizeSelector.SelectionChanged += (_o, _e) => fontSize = (float)sizeSelector.SelectedItem;
+                sizeSelector.SelectedItem = screen.font_size;
+                sizeSelector.SelectionChanged += (_o, _e) => screen.font_size = (float)sizeSelector.SelectedItem;
                 tool_options_container.Children.Add(sizeSelector);
             }
         }
@@ -450,18 +450,61 @@ namespace AVSketch
 
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            screen = new Screen();
+            name = "";
+            alreadySaved = false;
+            load();
+            fixTitle();
         }
 
         private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "AVSketch File(*.av)|*.av";
+            if (dialog.ShowDialog() == true)
+            {
+                screen = AVFile.Unconvert(dialog.FileName);
+                name = dialog.FileName;
+                alreadySaved = true;
+                load();
+                fixTitle();
+            }
         }
 
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-
+            if (!alreadySaved)
+            {
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.Filter = "AVSketch File(*.av)|*.av";
+                if (dialog.ShowDialog() == true)
+                {
+                    AVFile.Convert(screen, dialog.FileName);
+                    name = dialog.FileName;
+                    alreadySaved = true;
+                    fixTitle();
+                }
+            }
+            else
+            {
+                AVFile.Convert(screen, name);
+            }
         }
+
+        private void SaveAsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "AVSketch File(*.av)|*.av";
+            if (dialog.ShowDialog() == true)
+            {
+                AVFile.Convert(screen, dialog.FileName);
+                name = dialog.FileName;
+                alreadySaved = true;
+                fixTitle();
+
+            }
+        }
+
 
         private void UndoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -507,7 +550,7 @@ namespace AVSketch
         {
             if (screen.outlinedObject != null)
             {
-                clipboard.obj = screen.objects[screen.outlinedObject];
+                clipboard.obj = screen.objects[screen.outlinedObject].Clone();
                 clipboard.clipped = true;
             }
         }
@@ -516,7 +559,8 @@ namespace AVSketch
         {
             if (screen.outlinedObject != null)
             {
-                clipboard.obj = screen.objects[screen.outlinedObject];
+                actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
+                clipboard.obj = screen.objects[screen.outlinedObject].Clone();
                 screen.objects.Remove(screen.outlinedObject);
                 clipboard.clipped = true;
             }
@@ -527,15 +571,22 @@ namespace AVSketch
             if (clipboard.clipped)
             {
                 screen.outlinedObject = Environment.TickCount.ToString();
-                screen.objects.Add(screen.outlinedObject, clipboard.obj);
+                screen.objects.Add(screen.outlinedObject, clipboard.obj.Clone());
                 screen.objects[screen.outlinedObject].position.add(2f, 2f);
+                clipboard.obj.position.add(2f, 2f);
+                actions.push(new Action(screen.outlinedObject, ActionType.add, screen.objects[screen.outlinedObject]));
+                //MessageBox.Show(screen.objects.Count.ToString());
+                
             }
         }
 
         private void DeleteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
-            screen.objects.Remove(screen.outlinedObject);
+            if (screen.outlinedObject != "")
+            {
+                actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
+                screen.objects.Remove(screen.outlinedObject);
+            }
         }
     }
 }
