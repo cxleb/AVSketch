@@ -13,6 +13,8 @@ namespace AVSketch
 {
     class AVFile
     {
+        // this class contains two static functions which convert the screen class to an xml file, and back again
+        // i wanted to use json serialization but this failed, as a result this monstrousity was born
 
         public AVFile()
         {
@@ -21,10 +23,7 @@ namespace AVSketch
 
         public static void Convert(Screen screen, string path)
         {
-            //MemoryStream stream = new MemoryStream();
-            //XmlSerializer serializer = new XmlSerializer(typeof(Screen));
-            //serializer.Serialize(stream, screen);
-            //StreamReader reader = new StreamReader(stream);
+            // generates an xml document, creates a "screen" node and sets some attributes, so it looks it <screen colour="000000" translateX="382" translateY="255.5" outlined="163275078" stroke="3" fontSize="24" currentFillIn="True">
             XmlDocument doc = new XmlDocument();
             XmlElement xmlScreen = doc.CreateElement("screen");
             xmlScreen.SetAttribute("colour", screen.current_colour);
@@ -34,12 +33,15 @@ namespace AVSketch
             xmlScreen.SetAttribute("stroke", screen.stroke_thickness.ToString());
             xmlScreen.SetAttribute("fontSize", screen.font_size.ToString());
             xmlScreen.SetAttribute("currentFillIn", screen.current_fill_in.ToString());
+            // loops through each object and adds an xml node to the screen node
             foreach(KeyValuePair<string, VectorObject> pair in screen.objects)
             {
+                // creates the element with the name based on its class and then sets some generic types
                 XmlElement element = doc.CreateElement(pair.Value.GetType().ToString().Remove(0, 27).ToLowerInvariant());
                 element.SetAttribute("uid", pair.Key);
                 element.SetAttribute("position", pair.Value.position.x.ToString() + "," + pair.Value.position.y.ToString());
                 element.SetAttribute("colour", pair.Value.colour);
+                // finds out which object it is and then sets the relevant types in xml
                 switch (element.Name)
                 {
                     case "line":
@@ -73,16 +75,19 @@ namespace AVSketch
                 xmlScreen.AppendChild(element);
             }
             doc.AppendChild(xmlScreen);
+            // saves it
             doc.Save(path);
         }
 
         public static Screen Unconvert(string path)
         {
+            // creates an xml doc and loads it
             XmlDocument doc = new XmlDocument();
             Screen screen = new Screen();
             doc.Load(path);
-            if (doc.HasChildNodes)
+            if (doc.HasChildNodes) // ensures we have a screen element
             {
+                // gets the stuff from the screen node
                 XmlElement xml = (XmlElement)doc.ChildNodes[0];
                 screen.current_colour = xml.GetAttributeNode("colour").InnerXml;
                 screen.translateX = float.Parse(xml.GetAttributeNode("translateX").InnerXml);
@@ -93,6 +98,7 @@ namespace AVSketch
                 screen.current_fill_in = bool.Parse(xml.GetAttributeNode("currentFillIn").InnerXml);
                 if (xml.HasChildNodes)
                 { 
+                    // loops through all the objects and creates objects then adds them to the screen class, mostly self explanatory and repetitive code
                     for (int i = 0; i < xml.ChildNodes.Count; i++)
                     {
                         XmlElement child = (XmlElement)xml.ChildNodes[i];
@@ -159,83 +165,5 @@ namespace AVSketch
             }
             return screen;
         }
-
-        /*
-
-        public string getOperand(string line)
-        {
-            return line.Split(' ')[1];
-        }
-
-        public Screen getArray()
-        {
-            Screen screen = new Screen();
-
-            string textfile = "";
-            string[] lines = textfile.Split('\n');
-
-            bool inobjects = false;
-            VectorObject obj;
-
-            foreach(string line in lines)
-            {
-                if (line == "[HEADER]")
-                {
-                    inobjects = false;
-                    continue;
-                }
-                else if (line == "[OBJECTS]")
-                {
-                    inobjects = true;
-                    continue;
-                }
-
-                if (inobjects)
-                {
-                    if (line.StartsWith("newobj"))
-                    {
-                        switch (getOperand(line))
-                        {
-                            case "line":
-                                obj = new VectorObject();
-                                break;
-                            case "box":
-                                break;
-                            case "ellipse":
-                                break;
-                            case "text":
-                                break;
-                        }
-                    }
-                }
-                else
-                {
-                    if (line.StartsWith("colour"))
-                    {
-                        screen.current_colour = getOperand(line);
-                    }
-                    else if (line.StartsWith("trans_x"))
-                    {
-                        screen.translateX = float.Parse(getOperand(line));
-                    }
-                    else if (line.StartsWith("trans_y"))
-                    {
-                        screen.translateY = float.Parse(getOperand(line));
-                    }
-                    else if (line.StartsWith("stroke"))
-                    {
-                        screen.stroke_thickness = float.Parse(getOperand(line));
-                    }
-                    else if (line.StartsWith("font_size"))
-                    {
-                        screen.font_size = float.Parse(getOperand(line));
-                    }
-                }
-            }
-
-            return screen;
-        }
-
-        */
     }
 }

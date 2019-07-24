@@ -11,6 +11,7 @@ namespace AVSketch
 {
     public class Screen
     {
+        // this stores all the information related to that session or "file", most of this is saved and is stored here for organisation
         public Dictionary<string, VectorObject> objects;
         public string current_colour = "000000";
         public float translateX = 0f;
@@ -27,12 +28,17 @@ namespace AVSketch
             objects = new Dictionary<string, VectorObject>();
         }
 
+        // makes-life-easier stub for adding objects
         public void addObject(string uid, VectorObject _object)
         {
             objects[uid] = _object;
 
         }
 
+        // this finds the object in which the point is lying in, uses the bounding box idea to basically calculate if it is in between the box
+        // this could do with some tweaking but its big and scary
+        // the general idea is to loop through every object and check if it lies in between the box, if not ignore
+        // the concept is repeated for all the object types, but they all do the same thing
         public void findSelected(VectorPoint seletedPoint)
         {
             foreach (KeyValuePair<string, VectorObject> obj in objects)

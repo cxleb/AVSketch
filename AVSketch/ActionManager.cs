@@ -29,6 +29,11 @@ namespace AVSketch
         }
     }
 
+    // handles undos and redos
+    // a list is used and a pointer makes it act like a stack
+    // to push on an action and it will removes any items "above" the pointer before adding it
+    // undo removes one from the pointer and then gives the action at that location
+    // redo gives the action at the current pointer then adds one
     class ActionManager
     {
         List<Action> stack;
@@ -51,7 +56,6 @@ namespace AVSketch
             if (pointer > 0)
             {
                 pointer--;
-                //print();
                 return stack[pointer];
             }
             return null;

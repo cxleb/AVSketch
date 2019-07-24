@@ -26,14 +26,11 @@ namespace AVSketch
         // 3 - fix line algorithim, make the points based on the mouse acceleration not moving every ten pixels
         // 8 - tidy code up, make it more scalable?
         // 11 - ICONS (text is nice its easily readable)
-        // 13 - create a method for generating unqiue keys, aka do not rely on tooluid = Environment.TickCount.ToString();
-        // 14 - replace tooluid to screen.outlinedObject
-        // 15 - fix variable size fromThisFormat to_this_format
+        // 13 - create a method for generating unqiue keys, aka do not rely on uid = Environment.TickCount.ToString();
         // FUTURE GOALS -> take complete advantage of c# event driven nature and implement a completely event driven system, for super scalability
 
         int activeTool = 2; // 0 - pan, 1 - shape, 2 - line, 3 - text, 4 - transform
-        string tooluid;
-
+        
         double prevX = 0;
         double prevY = 0;
         double mouseOldX = 0;
@@ -58,6 +55,7 @@ namespace AVSketch
             graphics = new Graphics();
             screen = new Screen();
 
+            //this creates a dummy image(so errors dont get thrown), links it with the image on the wpf form, and then binds the update image method to the render cycle via LINQ
             graphics.CreateImage(800, 600);
             DataContext = graphics;
             CompositionTarget.Rendering += (_o, _e) => graphics.UpdateImage(screen);
@@ -72,25 +70,30 @@ namespace AVSketch
 
         private void load()
         {
+            //does some fancy math to get width and height of image, create the actual image and then set the center of the screen
             int width = (int)imaging_grid.ActualWidth;
             int height = (int)imaging_grid.RowDefinitions[1].ActualHeight;
             graphics.CreateImage(width, height);
             screen.translateX = graphics.width / 2f;
             screen.translateY = graphics.height / 2f;
 
+            // this needs to be reset everytime we load a new file
             actions = new ActionManager();
             clipboard = new Clipboard();
 
             interpretTooling();
             update_colour();
         }
+
         private void fixTitle()
         {
+            // sets the title with the file currently being edited
             this.Title = "AVSketch " + name;
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            // same stuff as the load routine but without the acutal loading bits
             int width = (int)imaging_grid.ActualWidth;
             int height = (int)imaging_grid.RowDefinitions[1].ActualHeight;
             graphics.CreateImage(width, height);
@@ -99,64 +102,82 @@ namespace AVSketch
         }
 
         // TOOL LOGIC
+        // this is all the event handlers which deal with the tool functionality alot of it is really hacky and badly done but it had got to be done
+        // alot of this code is rinse and repeat, firstly when the event occurs it checks what tool is being used and then it does the stuff for that tool
+        // the tooling variablen is used to see if we are actually using that tool currently
 
         private void ImageContainer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            //converts the mouse position in screen coordinates to vector space coordinates
             float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
             float y = ((float)e.GetPosition(imageContainer).Y - screen.translateY) / Graphics.scale;
-            if (activeTool == 0)
+            if (activeTool == 0) // pan
             {
+                // saves the current mouse position so the difference doesnt freak out
                 mouseOldX = e.GetPosition(imageContainer).X;
                 mouseOldY = e.GetPosition(imageContainer).Y;
                 tooling = true;
             }
-            if (activeTool == 1)
+            if (activeTool == 1) // shape
             {
-                tooluid = Environment.TickCount.ToString();
+                // generates a new uid
+                screen.outlinedObject = Environment.TickCount.ToString();
                 if (current_shape == "box")
                 {
-                    screen.addObject(tooluid, new VectorBox(new VectorPoint(x, y), new VectorPoint(1,1), screen.current_fill_in));
-                    (screen.objects[tooluid] as VectorBox).strokeThickness = screen.stroke_thickness;
+                    // creates a new box at x,y with size 1,1
+                    screen.addObject(screen.outlinedObject, new VectorBox(new VectorPoint(x, y), new VectorPoint(1,1), screen.current_fill_in));
+                    // sets whether the shape should be filled in 
+                    (screen.objects[screen.outlinedObject] as VectorBox).fillin = screen.current_fill_in;
                 }
                 else if (current_shape == "ellipse")
                 {
-                    screen.addObject(tooluid, new VectorEllipse(new VectorPoint(x, y), new VectorPoint(0.001f, 0.001f), screen.current_fill_in));
-                    (screen.objects[tooluid] as VectorEllipse).strokeThickness = screen.stroke_thickness;
+                    // creates a new ellipse at x,y with size 0.001f,0.001f
+                    screen.addObject(screen.outlinedObject, new VectorEllipse(new VectorPoint(x, y), new VectorPoint(0.001f, 0.001f), screen.current_fill_in));
+                    // sets whether the shape should be filled in 
+                    (screen.objects[screen.outlinedObject] as VectorEllipse).fillin = screen.current_fill_in;
                 }
-                screen.objects[tooluid].colour = screen.current_colour;
+                // sets the stroke thickness & colour to the current stroke thickness & colour
+                (screen.objects[screen.outlinedObject] as VectorBox).strokeThickness = screen.stroke_thickness;
+                screen.objects[screen.outlinedObject].colour = screen.current_colour;
                 tooling = true;
+                // saves the current x,y value for calculating the size
                 prevX = x;
                 prevY = y;
-                screen.outlinedObject = tooluid;
             }
-            if (activeTool == 2)
+            if (activeTool == 2) // line
             {
-                tooluid = Environment.TickCount.ToString();
-                screen.addObject(tooluid, new VectorLine(new VectorPoint(x, y)));
-                screen.objects[tooluid].colour = screen.current_colour;
-                (screen.objects[tooluid] as VectorLine).strokeThickness = screen.stroke_thickness;
+                // generates new uid
+                screen.outlinedObject = Environment.TickCount.ToString();
+                // creates a new line at x,y
+                screen.addObject(screen.outlinedObject, new VectorLine(new VectorPoint(x, y)));
+                // sets the stroke thickness & colour to the current stroke thickness & colour
+                screen.objects[screen.outlinedObject].colour = screen.current_colour;
+                (screen.objects[screen.outlinedObject] as VectorLine).strokeThickness = screen.stroke_thickness;
                 tooling = true;
+                // saves the current x,y value for calculating the line based from the origin
                 prevX = x;
                 prevY = y;
-                screen.outlinedObject = tooluid;
-                (screen.objects[tooluid] as VectorLine).calculateMinMax();
+                // starts the calculate the size of the line
+                (screen.objects[screen.outlinedObject] as VectorLine).calculateMinMax();
             }
-            if (activeTool == 3)
+            if (activeTool == 3) // text
             {
-                tooluid = Environment.TickCount.ToString();
-                screen.addObject(tooluid, new VectorText(new VectorPoint(x, y), ""));
-                screen.objects[tooluid].colour = screen.current_colour;
-                (screen.objects[tooluid] as VectorText).fontSize = screen.font_size;
+                // generates new uid
+                screen.outlinedObject = Environment.TickCount.ToString();
+                // creates a new object
+                screen.addObject(screen.outlinedObject, new VectorText(new VectorPoint(x, y), ""));
+                // sets the font size & colour to the current font size & colour
+                screen.objects[screen.outlinedObject].colour = screen.current_colour;
+                (screen.objects[screen.outlinedObject] as VectorText).fontSize = screen.font_size;
                 tooling = true;
-                screen.outlinedObject = tooluid;
-
-                actions.push(new Action(tooluid, ActionType.add, screen.objects[tooluid]));
             }
-            if (activeTool == 4)
+            if (activeTool == 4) // object
             {
+                // finds the currently selected coordinates
                 screen.outlinedObject = "";
                 screen.findSelected(new VectorPoint(x, y));
                 tooling = true;
+                // saves the old x,y for calculating difference 
                 prevX = x;
                 prevY = y;
             }
@@ -169,72 +190,84 @@ namespace AVSketch
             {
                 tooling = false;
             }
-            if(activeTool == 4)
-            {
-                tooling = false;
-                if (screen.outlinedObject != "")
-                {
-                    actions.push(new Action(screen.outlinedObject, ActionType.modify, screen.objects[screen.outlinedObject]));
-                }
-            }
             if (activeTool == 2 || activeTool == 1)
             {
                 tooling = false;
+                //register the action for under/redo
                 actions.push(new Action(screen.outlinedObject, ActionType.add, screen.objects[screen.outlinedObject]));
             }
             if (activeTool == 2)
             {
+                // adds a point when you release your mouse to look like the line went to the end
                 float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
                 float y = ((float)e.GetPosition(imageContainer).Y - screen.translateY) / Graphics.scale;
-                float dx = (screen.objects[tooluid] as VectorLine).position.x;
-                float dy = (screen.objects[tooluid] as VectorLine).position.y;
-                (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x - dx, y - dy));
-                (screen.objects[tooluid] as VectorLine).calculateMinMax();
+                float dx = (screen.objects[screen.outlinedObject] as VectorLine).position.x;
+                float dy = (screen.objects[screen.outlinedObject] as VectorLine).position.y;
+                (screen.objects[screen.outlinedObject] as VectorLine).addPoint(new VectorPoint(x - dx, y - dy));
+                (screen.objects[screen.outlinedObject] as VectorLine).calculateMinMax();
+            }
+            if(activeTool == 3)
+            {
+                //register the action for under/redo
+                actions.push(new Action(screen.outlinedObject, ActionType.add, screen.objects[screen.outlinedObject]));
+            }
+            if (activeTool == 4)
+            {
+                tooling = false;
+                // only add the object if we used it
+                if (screen.outlinedObject != "")
+                {
+                    //register the action for under/redo
+                    actions.push(new Action(screen.outlinedObject, ActionType.modify, screen.objects[screen.outlinedObject]));
+                }
             }
         }
 
         private void Image_MouseMove(object sender, MouseEventArgs e)
         {
+            //we should only do these if we are actualling the tool
             if (tooling)
             {
+                //converts the mouse position in screen coordinates to vector space coordinates
                 float x = ((float)e.GetPosition(imageContainer).X - screen.translateX) / Graphics.scale;
                 float y = ((float)e.GetPosition(imageContainer).Y - screen.translateY) / Graphics.scale;
-                if (activeTool == 0)
+                if (activeTool == 0) // pan
                 {
+                    // removes the difference of the mouse position within the screen and then set that as the old coordinates
                     screen.translateX -= (float)( mouseOldX - e.GetPosition(imageContainer).X);
                     screen.translateY -= (float)( mouseOldY - e.GetPosition(imageContainer).Y);
                     mouseOldX = e.GetPosition(imageContainer).X;
                     mouseOldY = e.GetPosition(imageContainer).Y;
                 }
-                if(activeTool == 1)
+                if(activeTool == 1) // shape
                 {
                     if (current_shape == "box")
                     {
-                        (screen.objects[tooluid] as VectorBox).size.x = x - (float)prevX;
-                        (screen.objects[tooluid] as VectorBox).size.y = y - (float)prevY;
-                        (screen.objects[tooluid] as VectorBox).fillin = screen.current_fill_in;
+                        // sets the size based on the difference of position from now vs whem you clicked
+                        (screen.objects[screen.outlinedObject] as VectorBox).size.x = x - (float)prevX;
+                        (screen.objects[screen.outlinedObject] as VectorBox).size.y = y - (float)prevY;
                     }
                     else if (current_shape == "ellipse")
                     {
-                        (screen.objects[tooluid] as VectorEllipse).radii.x = x - (float)prevX;
-                        (screen.objects[tooluid] as VectorEllipse).radii.y = y - (float)prevY;
-                        (screen.objects[tooluid] as VectorEllipse).fillin = screen.current_fill_in;
+                        // sets the size based on the difference of position from now vs whem you clicked
+                        (screen.objects[screen.outlinedObject] as VectorEllipse).radii.x = x - (float)prevX;
+                        (screen.objects[screen.outlinedObject] as VectorEllipse).radii.y = y - (float)prevY;
                     }
                 }
-                if (activeTool == 2)
+                if (activeTool == 2) // line
                 {
+                    // decides if you have moved the mouse in any direction at least 1 unit, if so add a point
                     if (Math.Abs(prevX - x) >= 1 || Math.Abs(prevY - y) >= 1)
                     {
-                        float dx = (screen.objects[tooluid] as VectorLine).position.x;
-                        float dy = (screen.objects[tooluid] as VectorLine).position.y;
-                        (screen.objects[tooluid] as VectorLine).addPoint(new VectorPoint(x - dx, y - dy));
-                        prevX = x;
-                        prevY = y;
-                        (screen.objects[tooluid] as VectorLine).calculateMinMax();
+                        // add the point, which has its origin moved to where you clicked
+                        (screen.objects[screen.outlinedObject] as VectorLine).addPoint(new VectorPoint(x - (float)prevX, y - (float)prevY));
+                        // starts the calculate the size of the line
+                        (screen.objects[screen.outlinedObject] as VectorLine).calculateMinMax();
                     }
                 }
-                if(activeTool == 4 && screen.outlinedObject != "")
+                if(activeTool == 4 && screen.outlinedObject != "") // object
                 {
+                    // if we have actually selected an object then add to its position the difference of the mouse, then update the difference
                     screen.objects[screen.outlinedObject].position.add(x - (float)prevX, y - (float)prevY);
                     prevX = x;
                     prevY = y;
@@ -248,18 +281,24 @@ namespace AVSketch
             {
                 if (activeTool == 3)
                 {
+                    // this checks if the character is a backspace, if so remove the last character, if not then add it
                     if (e.Text == "\b")
                     {
-                        if ((screen.objects[tooluid] as VectorText).text.Length > 0)
+                        // make sure we have text before we remove any
+                        if ((screen.objects[screen.outlinedObject] as VectorText).text.Length > 0)
                         {
-                            (screen.objects[tooluid] as VectorText).text = (screen.objects[tooluid] as VectorText).text.Remove((screen.objects[tooluid] as VectorText).text.Length - 1);
-                            actions.push(new Action(tooluid, ActionType.modify, screen.objects[tooluid]));
+                            // this is really long but it simply removes the last character, no other way worked?
+                            (screen.objects[screen.outlinedObject] as VectorText).text = (screen.objects[screen.outlinedObject] as VectorText).text.Remove((screen.objects[screen.outlinedObject] as VectorText).text.Length - 1);
+                            //register the action for under/redo
+                            actions.push(new Action(screen.outlinedObject, ActionType.modify, screen.objects[screen.outlinedObject]));
                         }
                     }
                     else
                     {
-                        (screen.objects[tooluid] as VectorText).text += e.Text;
-                        actions.push(new Action(tooluid, ActionType.modify, screen.objects[tooluid]));
+                        // simply adds the text
+                        (screen.objects[screen.outlinedObject] as VectorText).text += e.Text;
+                        //register the action for under/redo
+                        actions.push(new Action(screen.outlinedObject, ActionType.modify, screen.objects[screen.outlinedObject]));
                     }
                 }
             }
@@ -268,6 +307,8 @@ namespace AVSketch
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            // this  complex if statement basically tries to catch the space bar, only when we are not using the text tool, and we arent using any other tool
+            // if so then just set the pan tool active, and fix the buttons
             if (e.Key == Key.Space && !e.IsRepeat && activeTool != 3 && !tooling)
             {
                 oldActiveTool = activeTool;
@@ -284,6 +325,7 @@ namespace AVSketch
 
         private void Window_PreviewKeyUp(object sender, KeyEventArgs e)
         {
+            // this just stops the pan tool via the space bar
             if (e.Key == Key.Space && !e.IsRepeat && activeTool != 3)
             {
                 activeTool = oldActiveTool;
@@ -294,6 +336,9 @@ namespace AVSketch
         }
 
         // TOOL SELECTOR BUTTONS
+
+        // these are the tool button handlers, they all do the same thing
+        // basically set the tool, ensure we arent using a tool and fix the buttons and options
 
         private void Pan_selector_Click(object sender, RoutedEventArgs e)
         {
@@ -330,6 +375,11 @@ namespace AVSketch
             interpretTooling();
         }
 
+        // this is a mess
+        // this is manual wpf code, it basically just sets the options for the indivdual tools with some fancy linq expressions for changing values
+        // most of these tools are instrinsicly named
+        // it also updates the colours on what tool we are using
+
         private void interpretTooling()
         {
             pan_selector.Background = activeTool == 0 ? Brushes.LightGray : Brushes.DarkGray;
@@ -340,7 +390,7 @@ namespace AVSketch
             
             tool_options_container.Children.RemoveRange(0, tool_options_container.Children.Count);
 
-            if(activeTool == 1 || activeTool == 2)
+            if(activeTool == 1 || activeTool == 2) // line or shape
             {
                 TextBlock strokeLabel = new TextBlock();
                 strokeLabel.Height = 24;
@@ -366,7 +416,7 @@ namespace AVSketch
                 tool_options_container.Children.Add(strokeSelector);
             }
 
-            if(activeTool == 1)
+            if(activeTool == 1) // shape
             {
                 TextBlock shapeLabel = new TextBlock();
                 shapeLabel.Height = 24;
@@ -393,7 +443,7 @@ namespace AVSketch
                 tool_options_container.Children.Add(fillin_check);
             }
 
-            if(activeTool == 3)
+            if(activeTool == 3) // text
             {
                 TextBlock sizeLabel = new TextBlock();
                 sizeLabel.Height = 24;
@@ -425,20 +475,24 @@ namespace AVSketch
 
         private void Colour_selector_Click(object sender, RoutedEventArgs e)
         {
+            // shows the colour picker window
             ColourPicker colourPicker = new ColourPicker(screen.current_colour);
             colourPicker.Show();
 
+            // binds an event handler to the colour change event
             colourPicker.ColourChange += ColourPicker_ColourChange;
         }
 
         private void ColourPicker_ColourChange(object sender, string colour)
         {
+            // simply sets the colour
             screen.current_colour = colour;
             update_colour();
         }
 
         public void update_colour()
         {
+            // sets the colour of the colour selector button, calculates rgb values then creates a brush and uses it
             int R = Int32.Parse(screen.current_colour.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
             int G = Int32.Parse(screen.current_colour.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
             int B = Int32.Parse(screen.current_colour.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
@@ -450,6 +504,7 @@ namespace AVSketch
 
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // reset everything, and then reloads
             screen = new Screen();
             name = "";
             alreadySaved = false;
@@ -459,6 +514,7 @@ namespace AVSketch
 
         private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // opens a dialog, loads the file, then reloads the screen
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "AVSketch File(*.av)|*.av";
             if (dialog.ShowDialog() == true)
@@ -473,8 +529,10 @@ namespace AVSketch
 
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // if we havent saved it then bring a dialog, if not then save it to the current destination
             if (!alreadySaved)
             {
+                // opens a dialog, saves the file and sets current file
                 SaveFileDialog dialog = new SaveFileDialog();
                 dialog.Filter = "AVSketch File(*.av)|*.av";
                 if (dialog.ShowDialog() == true)
@@ -487,12 +545,14 @@ namespace AVSketch
             }
             else
             {
+                // save to the current file
                 AVFile.Convert(screen, name);
             }
         }
 
         private void SaveAsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // opens a dialog, saves the file and sets current file
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "AVSketch File(*.av)|*.av";
             if (dialog.ShowDialog() == true)
@@ -508,6 +568,7 @@ namespace AVSketch
 
         private void UndoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // gets the undo action and interprets it which then completes that action
             Action action = actions.undo();
             if (action != null)
             {
@@ -528,6 +589,7 @@ namespace AVSketch
 
         private void RedoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // gets the redo action and interprets it which then completes that action
             Action action = actions.redo();
             if (action != null)
             {
@@ -548,7 +610,8 @@ namespace AVSketch
 
         private void CopyCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (screen.outlinedObject != null)
+            // if there is a selected object then copy it to the clipboard
+            if (screen.outlinedObject != "")
             {
                 clipboard.obj = screen.objects[screen.outlinedObject].Clone();
                 clipboard.clipped = true;
@@ -557,8 +620,10 @@ namespace AVSketch
 
         private void CutCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (screen.outlinedObject != null)
+            // similar to copy excepts removes the object
+            if (screen.outlinedObject != "")
             {
+                //register the action for under/redo
                 actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
                 clipboard.obj = screen.objects[screen.outlinedObject].Clone();
                 screen.objects.Remove(screen.outlinedObject);
@@ -568,22 +633,26 @@ namespace AVSketch
 
         private void PasteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // if there is a clipped object then add that to the screen with an offset to visually identify it has been added
             if (clipboard.clipped)
-            {
+            {   
+                // generates new uid
                 screen.outlinedObject = Environment.TickCount.ToString();
+                // adds the objects and then adds the offset
                 screen.objects.Add(screen.outlinedObject, clipboard.obj.Clone());
                 screen.objects[screen.outlinedObject].position.add(2f, 2f);
                 clipboard.obj.position.add(2f, 2f);
+                //register the action for under/redo
                 actions.push(new Action(screen.outlinedObject, ActionType.add, screen.objects[screen.outlinedObject]));
-                //MessageBox.Show(screen.objects.Count.ToString());
-                
             }
         }
 
         private void DeleteCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            // if an object is selected, then remove it
             if (screen.outlinedObject != "")
             {
+                //register the action for under/redo
                 actions.push(new Action(screen.outlinedObject, ActionType.delete, screen.objects[screen.outlinedObject]));
                 screen.objects.Remove(screen.outlinedObject);
             }

@@ -21,6 +21,7 @@ namespace AVSketch
     {
         public string colour;
 
+        //event stuff
         public delegate void ColourChangeHandler(object sender, string colour);
         public event ColourChangeHandler ColourChange;
         private void RaiseChange()
@@ -34,6 +35,7 @@ namespace AVSketch
             InitializeComponent();
             colour = _colour;
 
+            // sets the initial value when we open the window
             red_slider.Value = Int32.Parse(_colour.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
             green_slider.Value = Int32.Parse(_colour.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
             blue_slider.Value = Int32.Parse(_colour.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
@@ -58,19 +60,26 @@ namespace AVSketch
 
         private void update_slider()
         {
+            // gets a hexadecimal version of the slider values
             string r = ((int)red_slider.Value).ToString("X2");
             string g = ((int)green_slider.Value).ToString("X2");
             string b = ((int)blue_slider.Value).ToString("X2");
+            // sets the text in the boxes
             red_text.Text = ((int)red_slider.Value).ToString();
             green_text.Text = ((int)green_slider.Value).ToString();
             blue_text.Text = ((int)blue_slider.Value).ToString();
+            // makes the rbg colours
             colour = r + g + b;
 
+            // makes a new brush to the set the colour of the colour shower
             var brush = new SolidColorBrush(Color.FromArgb(255, (byte)red_slider.Value, (byte)green_slider.Value, (byte)blue_slider.Value));
             colour_shower.Fill = brush;
 
+            // raise the colour change event so we know it happened
             RaiseChange();
         }
+
+        // THIS DOESNT WORK AND DOESNT NEED TO BE ADDED \/
 
         private void Red_text_TextChanged(object sender, TextChangedEventArgs e)
         {

@@ -26,6 +26,7 @@ namespace AVSketch.VectorModel
             points.Add(point);
         }
 
+        // finds the max min x and y coords so we can get a bounding box of the line
         public void calculateMinMax()
         {
             minX = 0f;
